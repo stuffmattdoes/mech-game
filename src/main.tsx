@@ -1,8 +1,10 @@
 import { Color, NearestFilter, RepeatWrapping, Vector2 } from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, Stats, StatsGl, useProgress, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
+import { Bloom, DepthOfField, EffectComposer, Pixelation, SSAO } from '@react-three/postprocessing';
+// import { BloomPass, EffectComposer } from 'three-stdlib';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -15,14 +17,30 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Environment/>
           <Scene/>
         </Suspense>
+        <Suspense fallback={null}>
+          <Effects/>
+        </Suspense>
       </Canvas>
     </div>
   </React.StrictMode>,
-)
+);
 
 function Loader() {
   const { progress } = useProgress();
   return <Html center>{progress} % loaded</Html>
+}
+
+function Effects() {
+  return <EffectComposer>
+    <Pixelation granularity={15}/>
+    {/* <DepthOfField
+      focusDistance={0} // where to focus
+      focalLength={0.02} // focal length
+      bokehScale={2} // bokeh size
+    /> */}
+    {/* <Bloom /> */}
+    {/* <SSAO /> */}
+  </EffectComposer>;
 }
 
 function Environment() {
@@ -49,12 +67,12 @@ function Environment() {
       position={[0, 8, 14]}
     />
     <ambientLight
-      color={new Color(0x2d3645)}
+      color={0x2d3645}
       intensity={10}
     />
     <directionalLight
       castShadow
-      color={new Color(0xfffc9c)}
+      color={0xfffc9c}
       position={[100, 100, 100]}
       shadow-mapsize={{ mapSize: new Vector2(2048, 2048)}}
       shadow-blurSamples={0}
@@ -76,7 +94,7 @@ function Scene() {
       texture.wrapT = RepeatWrapping;
     });
 
-  return <scene background={new Color(0x151729)}>
+  return <scene>
     <Gem
       position={[0, 0.5, 0]}
     />
@@ -139,7 +157,7 @@ function Gem({
     const time = clock.getElapsedTime();
     meshRef.current.rotation.y = time;
     meshRef.current.position.y = position[1] + Math.sin(time) / 8;
-    materialRef.current.emissiveIntensity = Math.sin(time * 3 ) + 1
+    materialRef.current.emissiveIntensity = Math.sin(time * 5) + 5;
   });
 
   return <mesh
