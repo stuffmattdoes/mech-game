@@ -46,7 +46,7 @@ function Environment() {
     <PerspectiveCamera
       fov={5}
       makeDefault
-      position={[0, 6, 12]}
+      position={[0, 8, 14]}
     />
     <ambientLight
       color={new Color(0x2d3645)}
@@ -78,15 +78,15 @@ function Scene() {
 
   return <scene background={new Color(0x151729)}>
     <Gem
-      position={[-.3, 0.6, .4]}
+      position={[0, 0.5, 0]}
     />
     <Box
-      position={[0, 0.4 / 2, 0]}
+      position={[.4, 0.4 / 2, -.25]}
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.4, 0.4, 0.4]}
     />
     <Box
-      position={[-.4, 0.2 / 2, -.15]}
+      position={[-.4, 0.2 / 2, -.25]}
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
