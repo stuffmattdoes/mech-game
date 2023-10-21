@@ -1,10 +1,10 @@
-import { Color, NearestFilter, RepeatWrapping, Vector2 } from 'three';
+import { BasicShadowMap, Color, NearestFilter, RepeatWrapping, Vector2 } from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, SpotLightShadow, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Bloom, DepthOfField, EffectComposer, Pixelation, SSAO } from '@react-three/postprocessing';
-// import { BloomPass, EffectComposer } from 'three-stdlib';
+import { EffectComposer, Pixelation } from '@react-three/postprocessing';
+import './App.css';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -74,8 +74,10 @@ function Environment() {
       castShadow
       color={0xfffc9c}
       position={[100, 100, 100]}
-      shadow-mapsize={{ mapSize: new Vector2(2048, 2048)}}
-      shadow-blurSamples={0}
+      // shadow-mapsize={{ mapSize: [2048, 2048]}}
+      shadow-mapSize-width={2048}
+      shadow-mapSize-height={2048}
+      // shadow-blurSamples={0}
     />
     <OrbitControls/>
   </>
@@ -96,15 +98,15 @@ function Scene() {
 
   return <scene>
     <Gem
-      position={[0, 0.5, 0]}
+      position={[0, 0.5, .25]}
     />
     <Box
-      position={[.4, 0.4 / 2, -.25]}
+      position={[.4, 0.4 / 2, 0]}
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.4, 0.4, 0.4]}
     />
     <Box
-      position={[-.4, 0.2 / 2, -.25]}
+      position={[-.4, 0.2 / 2, 0]}
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
