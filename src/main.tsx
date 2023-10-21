@@ -1,21 +1,17 @@
-
 import { Color, NearestFilter, RepeatWrapping, Vector2 } from 'three';
-import { Canvas } from '@react-three/fiber';
-import { Html, OrbitControls, PerspectiveCamera, useProgress, useTexture } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, Stats, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 
-const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
-const renderResolution = screenResolution.clone().divideScalar(6);
-renderResolution.x |= 0;
-renderResolution.y |= 0;
-const aspectRatio = screenResolution.x / screenResolution.y;
+const NODE_ENV = process.env.NODE_ENV;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <div id='Canvas' style={{ width: '100vw', height: '100vh'}}>
       <Canvas shadows>
         <Suspense fallback={<Loader/>}>
+        {NODE_ENV !== 'production' ? <StatsGl/> : null}
           <Environment/>
           <Scene/>
         </Suspense>
@@ -30,6 +26,12 @@ function Loader() {
 }
 
 function Environment() {
+  // const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
+  // const renderResolution = screenResolution.clone().divideScalar(6);
+  // renderResolution.x |= 0;
+  // renderResolution.y |= 0;
+  // const aspectRatio = screenResolution.x / screenResolution.y;
+
   return <>
     {/* <OrthographicCamera
       bottom={-1}
@@ -44,7 +46,7 @@ function Environment() {
     <PerspectiveCamera
       fov={5}
       makeDefault
-      position={[0, 10, 20]}
+      position={[0, 6, 12]}
     />
     <ambientLight
       color={new Color(0x2d3645)}
@@ -130,9 +132,20 @@ function Gem({
   rotation = [0,0,0],
   scale = [1,1,1]
 }: IGameObject) {
+  const meshRef = React.useRef<any>();
+  const materialRef = React.useRef<any>();
+
+  useFrame(({ clock }) => {
+    const time = clock.getElapsedTime();
+    meshRef.current.rotation.y = time;
+    meshRef.current.position.y = position[1] + Math.sin(time) / 8;
+    materialRef.current.emissiveIntensity = Math.sin(time * 3 ) + 1
+  });
+
   return <mesh
     castShadow
     position={position}
+    ref={meshRef}
     rotation={rotation}
     scale={scale}
   >
@@ -142,7 +155,9 @@ function Gem({
       emissive: 0x143542,
       shininess: 100,
       specular: 0xffffff,
-    }]}/>
+    }]}
+    ref={materialRef}/>
+    <pointLight args={[ new Color(0x2379cf), .5, 0, 2 ]}/>
   </mesh>
 }
 
