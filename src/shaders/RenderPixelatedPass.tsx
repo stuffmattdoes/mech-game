@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useMemo, useRef } from 'react';
 import { useControls } from 'leva';
 import { Vector2, Vector4, Uniform, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
-import * as lol from '@react-three/postprocessing';
 import { BlendFunction, Effect, PixelationEffect } from 'postprocessing';
 
 const fragmentShader = `
