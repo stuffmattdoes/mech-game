@@ -268,7 +268,6 @@ export class PixelPass2 extends Effect {
 		super('PixelationEffect', `
             uniform bool active;
             uniform vec4 d;
-            uniform float granularity;
             
             void mainUv(inout vec2 uv) {
                 if(active) {
