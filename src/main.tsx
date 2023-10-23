@@ -4,16 +4,16 @@ import { Color, NearestFilter, RepeatWrapping, Vector2, Vector4 } from 'three';
 import { Canvas, extend, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer, Pixelation } from '@react-three/postprocessing';
-import { PixelShader } from 'three-stdlib';
-import { RenderPass, ShaderPass, Pass, RenderPixelatedPass } from 'three-stdlib';
 // import { Pixelate } from './Pixelate';
 // import { blurShader } from './shaders';
 import './App.css';
 import { Pixelize } from './shaders/RenderPixelatedPass';
+import { ShaderPass } from 'three-stdlib';
+import { PixelateShader } from './shaders/pixelate';
 
 const NODE_ENV = process.env.NODE_ENV;
 
-extend({ EffectComposer, RenderPass, RenderPixelatedPass, PixelShader, ShaderPass });
+extend({ ShaderPass });
 
 const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
 const renderResolution = screenResolution.clone().divideScalar(6);
@@ -32,9 +32,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </Suspense>
         <Suspense fallback={null}>
           <EffectComposer>
-            {/* <renderPass/> */}
-            {/* <Pixelation granularity={15}/> */}
             <Pixelize/>
+            {/* <shaderPass args={[PixelateShader]}/> */}
           </EffectComposer>
         </Suspense>
       </Canvas>

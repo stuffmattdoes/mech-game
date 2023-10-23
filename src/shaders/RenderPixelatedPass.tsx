@@ -1,5 +1,5 @@
-import { useThree } from '@react-three/fiber';
-import { Ref, forwardRef, useMemo } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { Ref, forwardRef, useEffect, useMemo, useRef } from 'react';
 import { useControls } from 'leva';
 import {
     WebGLRenderTarget,
@@ -14,11 +14,12 @@ import {
     Camera,
     Texture,
     Uniform,
+    WebGLRenderer,
 } from 'three';
-import { FullScreenQuad, Pass, RenderPixelatedPass } from 'three-stdlib';
+import { FullScreenQuad, Pass, PixelShader, RenderPixelatedPass, ShaderPass } from 'three-stdlib';
 import { Effect } from 'postprocessing';
 
-export class PixelPass extends Pass {
+export class PixelPass extends ShaderPass {
     readonly beautyRenderTarget: WebGLRenderTarget<Texture>;
     readonly camera: Camera;
     readonly depthEdgeStrength: number;
@@ -96,7 +97,7 @@ export class PixelPass extends Pass {
         this.setSize(this.resolution.x, this.resolution.y);
     }
 
-    render(renderer, writeBuffer) {
+    render(renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget) {
         console.log('render');
         const uniforms = this.fsQuad.material.uniforms;
         uniforms.normalEdgeStrength.value = this.normalEdgeStrength;
@@ -244,20 +245,21 @@ export class PixelPass extends Pass {
 			`
         });
     }
+
 }
 
-export class PixelPass2 extends Effect {
+export class WorkingPixelPass extends Effect {
     readonly _granularity: number;
     readonly resolution: Vector2;
     readonly granularity: number;
 
-	/**
-	 * Constructs a new pixelation effect.
-	 *
-	 * @param {Object} [granularity=30.0] - The pixel granularity.
-	 */
+    /**
+     * Constructs a new pixelation effect.
+     *
+     * @param {Object} [granularity=30.0] - The pixel granularity.
+     */
 
-	constructor(
+    constructor(
         granularity = 6,
         options = {
             enabled: true,
@@ -265,7 +267,7 @@ export class PixelPass2 extends Effect {
             normalEdgeStrength: 5
         }
     ) {
-		super('PixelationEffect', `
+        super('PixelationEffect', `
             uniform bool active;
             uniform vec4 d;
             
@@ -275,105 +277,113 @@ export class PixelPass2 extends Effect {
                 }
             }
         `, {
-			uniforms: new Map([
+            uniforms: new Map([
                 ['granularity', new Uniform(granularity)],
-				['active', new Uniform(options.enabled)],
-				['d', new Uniform(new Vector4())]
-			])
-		});
+                ['active', new Uniform(options.enabled)],
+                ['d', new Uniform(new Vector4())]
+            ])
+        });
 
-		/**
-		 * The original resolution.
-		 *
-		 * @type {Vector2}
-		 * @private
-		 */
+        /**
+         * The original resolution.
+         *
+         * @type {Vector2}
+         * @private
+         */
 
-		this.resolution = new Vector2();
+        this.resolution = new Vector2();
 
-		/**
-		 * Backing data for {@link granularity}.
-		 *
-		 * @type {Number}
-		 * @private
-		 */
+        /**
+         * Backing data for {@link granularity}.
+         *
+         * @type {Number}
+         * @private
+         */
 
-		this._granularity = 0;
-		this.granularity = granularity;
+        this._granularity = 0;
+        this.granularity = granularity;
 
-	}
+    }
 
-	/**
-	 * The pixel granularity.
-	 *
-	 * A higher value yields coarser visuals.
-	 *
-	 * @type {Number}
-	 */
+    /**
+     * The pixel granularity.
+     *
+     * A higher value yields coarser visuals.
+     *
+     * @type {Number}
+     */
 
-	// public get granularity() {
-	// 	return this._granularity;
-	// }
+    // public get granularity() {
+    // 	return this._granularity;
+    // }
 
-	// public set granularity(value: number) {
-	// 	let d = Math.floor(value);
-	// 	if(d % 2 > 0) {
-	// 		d += 1;
-	// 	}
+    // public set granularity(value: number) {
+    // 	let d = Math.floor(value);
+    // 	if(d % 2 > 0) {
+    // 		d += 1;
+    // 	}
 
-	// 	this._granularity = d;
-	// 	this.uniforms.get('active').value = (d > 0);
-	// 	this.setSize(this.resolution.width, this.resolution.height);
-	// }
+    // 	this._granularity = d;
+    // 	this.uniforms.get('active').value = (d > 0);
+    // 	this.setSize(this.resolution.width, this.resolution.height);
+    // }
 
-	/**
-	 * Updates the granularity.
-	 *
-	 * @param {Number} width - The width.
-	 * @param {Number} height - The height.
-	 */
+    /**
+     * Updates the granularity.
+     *
+     * @param {Number} width - The width.
+     * @param {Number} height - The height.
+     */
 
-	setSize(width: number, height: number) {
-		const resolution = this.resolution;
-		resolution.set(width, height);
+    setSize(width: number, height: number) {
+        const resolution = this.resolution;
+        resolution.set(width, height);
 
-		const d = this.granularity;
-		const x = d / resolution.x;
-		const y = d / resolution.y;
-		this.uniforms.get('d')?.value.set(x, y, 1.0 / x, 1.0 / y);
-	}
+        const d = this.granularity;
+        const x = d / resolution.x;
+        const y = d / resolution.y;
+        this.uniforms.get('d')?.value.set(x, y, 1.0 / x, 1.0 / y);
+    }
 
 }
 
 export type PixelizeProps = {
     granularity?: number
-  }
-  
-  export const Pixelize = forwardRef<PixelPass2, PixelizeProps>(function Pixelation({ granularity = 5 }, ref) {
+}
+
+export const Pixelize = forwardRef<PixelPass, PixelizeProps>(function Pixelation({ granularity = 5 }, ref) {
+    const _ref = useRef(ref);
     // const { camera, scene } = useThree();
-    const { details, enabled, outline} = useControls('Pixelize', {
+    const { details, enabled, outline } = useControls('Pixelize', {
         enabled: true,
+        granularity: { min: 0, max: 10, step: 1, value: 5 },
         details: { min: 0, max: 10, step: 1, value: 5 },
         outline: { min: 0, max: 10, step: 1, value: 5 },
     });
 
-    // const effect = useMemo(() => new PixelPass(
-    //     granularity,
-    //     scene,
-    //     camera, {
-    //         enabled,
-    //         depthEdgeStrength: outline,
-    //         normalEdgeStrength: details
-    //     }), [details, enabled, granularity]);
-
-    const effect = useMemo(() => new PixelPass2(
-        granularity,
-        {
+    const effect = useMemo(() => new WorkingPixelPass(
+        granularity, {
             enabled,
             depthEdgeStrength: outline,
             normalEdgeStrength: details
-        }
-    ), [granularity, enabled, outline, details]);
+        }), [details, enabled, granularity, outline]);
 
-    return <primitive ref={ref} object={effect} dispose={null} />
-  })
+    console.log(effect);
+
+    // const effect = useMemo(() => new PixelPass2(
+    //     granularity,
+    //     {
+    //         enabled,
+    //         depthEdgeStrength: outline,
+    //         normalEdgeStrength: details
+    //     }
+    // ), [granularity, enabled, outline, details]);
+
+    // const effect = useMemo(() => {
+    //     const mat = new ShaderMaterial(PixelShader);
+    //     console.log(mat);
+    //     return mat;
+    // }, [granularity, enabled, outline, details]);
+
+    return <primitive ref={_ref} object={effect} dispose={null} />
+});
