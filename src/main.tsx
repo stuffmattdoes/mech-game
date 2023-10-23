@@ -13,7 +13,7 @@ import { PixelateShader } from './shaders/pixelate';
 
 const NODE_ENV = process.env.NODE_ENV;
 
-extend({ ShaderPass });
+extend({ EffectComposer, ShaderPass });
 
 const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
 const renderResolution = screenResolution.clone().divideScalar(6);

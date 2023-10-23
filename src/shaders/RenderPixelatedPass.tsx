@@ -260,7 +260,7 @@ export class WorkingPixelPass extends Effect {
      */
 
     constructor(
-        granularity = 6,
+        granularity = 30,
         options = {
             enabled: true,
             depthEdgeStrength: 5,
