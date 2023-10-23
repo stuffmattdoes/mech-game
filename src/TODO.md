@@ -13,9 +13,15 @@
 * [ ] Detail shader
 * [ ] Pixel shader
     * [ ] disable anti-aliasing
-* [ ] sharp lighting
+* [ ] anti-aliasing
+* [ ] checker texture tiling
+* [ ] low-res screen-space color mapping
 
 ## Questions
 * How does three JS render screen-space shaders?
+* what are:
+    * pass
+    * shaderPass
+    * renderPass
 
 ## Done

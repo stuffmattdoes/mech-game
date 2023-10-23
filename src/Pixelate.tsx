@@ -1,15 +1,31 @@
-import { forwardRef, useMemo, Ref } from 'react';
-import { PixelationEffect } from 'postprocessing';
+import { forwardRef, useMemo } from 'react';
+import { Uniform } from 'three';
+import { Effect } from 'postprocessing';
 
-export type PixelationProps = {
-  granularity?: number
+const fragmentShader = `some_shader_code`
+
+// Effect implementation
+class PixelateEffect extends Effect {
+    granularity: Uniform<number>;
+
+    constructor(granularity = 0.1) {
+        super('Pixelize', fragmentShader, {
+            uniforms: new Map([['param', new Uniform(granularity)]]),
+        })
+
+        this.granularity = new Uniform(granularity);
+    }
+
+    update(renderer, inputBuffer, deltaTime) {
+        // this.uniforms.get('param').value = this._uParam;
+        this.uniforms.set('granularity', this.granularity);
+    }
 }
 
-export const Pixelation = forwardRef<PixelationEffect, PixelationProps>(function Pixelation(
-  { granularity = 5 }: PixelationProps,
-  ref: Ref<PixelationEffect>
-) {
-  /** Because GlitchEffect granularity is not an object but a number, we have to define a custom prop "granularity" */
-  const effect = useMemo(() => new PixelationEffect(granularity), [granularity])
-  return <primitive ref={ref} object={effect} dispose={null} />
+type PixelateProps = {
+    granularity: number
+}
+export const Pixelate = forwardRef(({ granularity }: PixelateProps, ref) => {
+    const effect = useMemo(() => new PixelateEffect(granularity), [granularity]);
+    return <primitive ref={ref} object={effect} dispose={null} />
 })
