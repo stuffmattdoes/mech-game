@@ -23,5 +23,6 @@
     * pass
     * shaderPass
     * renderPass
+* [custom pass](https://github.com/pmndrs/postprocessing/wiki/Custom-Passes) vs. [custom effect](https://github.com/pmndrs/postprocessing/wiki/Custom-Effects#tldr)
 
 ## Done

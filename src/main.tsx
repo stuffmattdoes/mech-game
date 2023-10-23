@@ -8,12 +8,11 @@ import { EffectComposer, Pixelation } from '@react-three/postprocessing';
 // import { blurShader } from './shaders';
 import './App.css';
 import { Pixelize } from './shaders/RenderPixelatedPass';
-import { ShaderPass } from 'three-stdlib';
-import { PixelateShader } from './shaders/pixelate';
+import { useControls } from 'leva';
 
 const NODE_ENV = process.env.NODE_ENV;
 
-extend({ EffectComposer, ShaderPass });
+extend({ EffectComposer });
 
 const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
 const renderResolution = screenResolution.clone().divideScalar(6);
@@ -25,21 +24,29 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <div id='Canvas' style={{ width: '100vw', height: '100vh' }}>
       <Canvas shadows>
+        <color attach='background' args={['#151729']} />
         <Suspense fallback={<Loader />}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
           <Scene />
-        </Suspense>
-        <Suspense fallback={null}>
-          <EffectComposer>
-            <Pixelize/>
-            {/* <shaderPass args={[PixelateShader]}/> */}
-          </EffectComposer>
+          <Effects />
         </Suspense>
       </Canvas>
     </div>
   </React.StrictMode>
 );
+
+function Effects() {
+  const { granularity } = useControls('Pixelize', {
+    enabled: true,
+		granularity: { min: 0, max: 100, step: 1, value: 40 },
+	});
+
+  return <EffectComposer>
+    <Pixelize enabled granularity={granularity} />
+    {/* <Pixelation granularity={granularity}/> */}
+  </EffectComposer>
+}
 
 function Loader() {
   const { progress } = useProgress();
