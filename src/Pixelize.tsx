@@ -6,11 +6,11 @@ import { useFrame } from '@react-three/fiber';
 
 
 const fragmentShader = `
-	uniform bool active;
+	uniform bool u_enabled;
 	uniform vec4 d;
 
 	void mainUv(inout vec2 uv) {
-		if (active) {
+		if (u_enabled) {
 			uv = d.xy * (floor(uv * d.zw) + 0.5);
 		}
 	}
@@ -23,20 +23,22 @@ const fragmentShader = `
  */
 
 export class PixelationEffect extends Effect {
-	_resolution: Vector2;
+	_enabled: boolean;
 	_granularity: number;
+	_resolution: Vector2;
 
 	constructor({ enabled = true, granularity = 30.0 }) {
 		super('PixelationEffect', fragmentShader, {
 			// @ts-ignore
 			uniforms: new Map([
-				['active', new Uniform(false)],
+				['u_enabled', new Uniform(false)],
 				['d', new Uniform(new Vector4())]
 			])
 		});
 
-		this._resolution = new Vector2();
+		this._enabled = enabled;
 		this._granularity = 0;
+		this._resolution = new Vector2();
 		this.granularity = granularity;
 
 	}
@@ -57,7 +59,7 @@ export class PixelationEffect extends Effect {
 		}
 
 		this._granularity = d;
-		this.uniforms.get('active').value = (d > 0);
+		this.uniforms.get('u_enabled').value = (d > 0) && this._enabled;
 		this.setSize(this._resolution.width, this._resolution.height);
 	}
 
