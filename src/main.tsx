@@ -8,10 +8,12 @@ import { EffectComposer, Pixelation } from '@react-three/postprocessing';
 // import { blurShader } from './shaders';
 import './styles.css';
 import { useControls } from 'leva';
+import { RenderPass } from 'three-stdlib';
+import { Pixelize } from './Pixelize';
 
 const NODE_ENV = process.env.NODE_ENV;
 
-extend({ EffectComposer });
+extend({ RenderPass });
 
 const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
 const renderResolution = screenResolution.clone().divideScalar(6);
@@ -28,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
           <Scene />
-          {/* <Effects /> */}
+          <Effects />
         </Suspense>
       </Canvas>
     </div>
@@ -36,13 +38,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 
 function Effects() {
-  const { enabled, granularity } = useControls('Pixelize', {
+  const controls = useControls('Pixelize', {
     enabled: true,
 		granularity: { min: 0, max: 100, step: 1, value: 40 },
 	});
 
   return <EffectComposer>
-    {/* <Pixelize /> */}
+    <renderPass/>
+    <Pixelize {...controls}/>
     {/* <Pixelation granularity={granularity}/> */}
   </EffectComposer>
 }
