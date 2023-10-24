@@ -43,13 +43,14 @@ export class PixelationEffect extends Effect {
 
 	}
 
-	/**
-	 * The pixel granularity.
-	 * A higher value yields coarser visuals.
-	 */
-	get granularity() {
-		return this._granularity;
+	get enabled() { return this._enabled; }
+	
+	set enabled(value: boolean) {
+		this._enabled = value;
+		this.setSize(this._resolution.width, this._resolution.height);
 	}
+
+	get granularity() { return this._granularity; }
 
 	set granularity(value) {
 		let d = Math.floor(value);
