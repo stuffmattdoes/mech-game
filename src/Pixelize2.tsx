@@ -1,9 +1,8 @@
 import { forwardRef, useMemo } from 'react';
 import { Uniform, Vector2, Vector4 } from 'three';
-import { Effect } from 'postprocessing';
+import { EffectAttribute, Effect } from 'postprocessing';
 
-// This effect is a copy of https://github.com/pmndrs/postprocessing/blob/main/src/effects/PixelationEffect.js
-// which is rendered by this example https://github.com/pmndrs/react-postprocessing/blob/master/src/effects/Pixelation.tsx
+// This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
 
 const fragmentShader = `
 	uniform bool u_enabled;
@@ -16,16 +15,10 @@ const fragmentShader = `
 	}
 `;
 
-/**
- * A pixelation effect.
- *
- * Warning: This effect cannot be merged with convolution effects.
- */
-
 export class PixelationEffect extends Effect {
-	_enabled: boolean;
-	_granularity: number;
-	_resolution: Vector2;
+	private _enabled: boolean;
+	private _granularity: number;
+	private _resolution: Vector2;
 
 	constructor({ enabled = true, granularity = 30.0 }) {
 		super('PixelationEffect', fragmentShader, {
@@ -33,7 +26,8 @@ export class PixelationEffect extends Effect {
 			uniforms: new Map([
 				['u_enabled', new Uniform(false)],
 				['d', new Uniform(new Vector4())]
-			])
+			]),
+			attributes: EffectAttribute.DEPTH
 		});
 
 		this._enabled = enabled;
@@ -41,18 +35,19 @@ export class PixelationEffect extends Effect {
 		this._resolution = new Vector2();
 		this.granularity = granularity;
 
+		console.log('defines', this.defines);
 	}
 
-	get enabled() { return this._enabled; }
+	// get enabled() { return this._enabled; }
 	
 	set enabled(value: boolean) {
 		this._enabled = value;
 		this.setSize(this._resolution.width, this._resolution.height);
 	}
 
-	get granularity() { return this._granularity; }
+	// get granularity() { return this._granularity; }
 
-	set granularity(value) {
+	set granularity(value: number) {
 		let _value = Math.floor(value);
 
 		if (_value % 2 > 0) {
@@ -60,7 +55,7 @@ export class PixelationEffect extends Effect {
 		}
 
 		this._granularity = _value;
-		this.uniforms.get('u_enabled').value = (_value > 0) && this._enabled;
+		this.uniforms.get('u_enabled')!.value = (_value > 0) && this._enabled;
 		this.setSize(this._resolution.width, this._resolution.height);
 	}
 
@@ -83,5 +78,6 @@ type PixelizeProps = {
 
 export const Pixelize = forwardRef<PixelationEffect, PixelizeProps>((props, ref) => {
 	const effect = useMemo(() => new PixelationEffect(props), [props.enabled, props.granularity]);
+	console.log(effect);
 	return <primitive ref={ref} object={effect} dispose={null} />;
 });
