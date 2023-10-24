@@ -6,8 +6,7 @@ import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, us
 import { EffectComposer, Pixelation } from '@react-three/postprocessing';
 // import { Pixelate } from './Pixelate';
 // import { blurShader } from './shaders';
-import './App.css';
-import { Pixelize } from './shaders/RenderPixelatedPass';
+import './styles.css';
 import { useControls } from 'leva';
 
 const NODE_ENV = process.env.NODE_ENV;
@@ -29,7 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
           <Scene />
-          <Effects />
+          {/* <Effects /> */}
         </Suspense>
       </Canvas>
     </div>
@@ -43,7 +42,7 @@ function Effects() {
 	});
 
   return <EffectComposer>
-    <Pixelize enabled={enabled} granularity={granularity} />
+    {/* <Pixelize /> */}
     {/* <Pixelation granularity={granularity}/> */}
   </EffectComposer>
 }
