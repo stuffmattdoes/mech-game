@@ -37,13 +37,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 
 function Effects() {
-  const { granularity } = useControls('Pixelize', {
+  const { enabled, granularity } = useControls('Pixelize', {
     enabled: true,
 		granularity: { min: 0, max: 100, step: 1, value: 40 },
 	});
 
   return <EffectComposer>
-    <Pixelize enabled granularity={granularity} />
+    <Pixelize enabled={enabled} granularity={granularity} />
     {/* <Pixelation granularity={granularity}/> */}
   </EffectComposer>
 }

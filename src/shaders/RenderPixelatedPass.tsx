@@ -24,24 +24,16 @@ export class Pixelizer extends Effect {
 	private _granularity: number;
 	// public granularity: number;
 	readonly resolution: Vector2;
-
-	/**
-	 * Constructs a new pixelation effect.
-	 *
-	 * @param {Object} [granularity=30.0] - The pixel granularity.
-	 */
-
-	constructor(
-		granularity: number,
-		{
-			enabled = true,
-			depthEdgeStrength = 50,
-			normalEdgeStrength = 50
-		}) {
+	constructor({
+		granularity = 30,
+		enabled = true,
+		depthEdgeStrength = 50,
+		normalEdgeStrength = 50
+	}) {
 		super('PixelationEffect', fragmentShader, {
 			// @ts-ignore
 			uniforms: new Map([
-				['u_enabled', new Uniform(false)],
+				['u_enabled', new Uniform(enabled)],
 				['d', new Uniform(new Vector4())]
 			])
 		});
