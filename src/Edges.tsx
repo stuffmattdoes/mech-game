@@ -22,7 +22,7 @@ class EdgeEffect extends Effect {
 		resolution: Vector2
 	) {
 		super(
-			'CustomEffect',
+			'EdgeShader`',
 			detailShader,
 			{
 				attributes: EffectAttribute.DEPTH,

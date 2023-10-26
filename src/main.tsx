@@ -10,6 +10,7 @@ import './styles.css';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './Edges';
+import { Pixels } from './Pixelize';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -46,8 +47,10 @@ function Effects() {
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
-    <renderPass/>
+    {/* <renderPass/> */}
     <Edges {...controls}/>
+    <Pixelation granularity={controls.granularity}/>
+    {/* <Pixels {...controls}/> */}
     {/* <Pixelation granularity={granularity}/> */}
   </EffectComposer>
 }

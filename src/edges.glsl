@@ -79,9 +79,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
         float strength = outline > 0.0
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
-        // float strength = outline > 0.0 ? 0.0 : 1.0;
 
-        // uv = resolution.xy * (floor(uv * resolution.zw) + 0.5);
         outputColor = vec4(inputColor.rgb * strength, inputColor.a);
     #else
         outputColor = inputColor;
