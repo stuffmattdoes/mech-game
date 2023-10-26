@@ -19,7 +19,9 @@ class PixelEffect extends Effect {
 			pixelShader,
 			{
 				blendFunction: BlendFunction.NORMAL,
+                // @ts-ignore
 				uniforms: new Map([
+                    ['granularity', new Uniform(granularity)],
 					['resolution', new Uniform(new Vector4(
 						resolution.x,
 						resolution.y,

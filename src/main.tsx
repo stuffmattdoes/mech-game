@@ -51,7 +51,6 @@ function Effects() {
     <Edges {...controls}/>
     <Pixelation granularity={controls.granularity}/>
     {/* <Pixels {...controls}/> */}
-    {/* <Pixelation granularity={granularity}/> */}
   </EffectComposer>
 }
 

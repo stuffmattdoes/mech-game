@@ -72,16 +72,8 @@ type EdgeProps = {
 export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
 	const { normalPass } = useContext(EffectComposerContext);
 	const { size } = useThree();
-	// const depthTexture = useDepthBuffer({ size: size.width });
-
-	// depthTexture.format = pixelFormat
-    // depthTexture.minFilter = NearestFilter;
-    // depthTexture.magFilter = NearestFilter;
-    // depthTexture.generateMipmaps = false;
-    // depthTexture.stencilBuffer = false
-
 	const effect = useMemo(() =>
 		new EdgeEffect(enabled, granularity, details, outlines, normalPass?.texture!, new Vector2(size.width, size.height)),
 		[details, enabled, granularity, normalPass, outlines, size]);
-	return <primitive ref={ref} object={effect} dispose={null} />;
+	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
