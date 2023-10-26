@@ -41,7 +41,7 @@ function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
 		granularity: { min: 0, max: 16, step: 1, value: 8 },
-    outlines: { min: 0, max: 1.0, step: 0.2, value: 1.0 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 1.0 },
     details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
 	});
 
@@ -59,7 +59,7 @@ function Loader() {
 
 function Environment() {
   return <>
-    {/* <OrthographicCamera
+    <OrthographicCamera
       bottom={-1}
       far={10}
       left={-aspectRatio}
@@ -68,12 +68,12 @@ function Environment() {
       position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
       right={aspectRatio}
       top={1}
-    /> */}
-    <PerspectiveCamera
+    />
+    {/* <PerspectiveCamera
       fov={5}
       makeDefault
       position={[0, 8, 14]}
-    />
+    /> */}
     <ambientLight
       color={0x2d3645}
       intensity={10}

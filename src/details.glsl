@@ -1,10 +1,12 @@
 uniform float detailStrength;
 uniform sampler2D tNormal;
+uniform sampler2D depthBuffer;
 // uniform sampler2D depthBuffer;
 uniform float outlineStrength;
 uniform vec4 resolution;
 
 float getDepth(int x, int y) {
+    // samples depth buffer 
     return texture2D(depthBuffer, vUv + vec2(x, y) * resolution.zw).r;
 }
 
@@ -14,11 +16,20 @@ vec3 getNormal(int x, int y) {
 
 float getOutline(float depth) {
     float diff = 0.0;
-    diff += clamp(getDepth(1, 0) - depth, 0.0, 1.0);
-    diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);
-    diff += clamp(getDepth(0, 1) - depth, 0.0, 1.0);
-    diff += clamp(getDepth(0, -1) - depth, 0.0, 1.0);
-    return floor(smoothstep(0.01, 0.02, diff) * 2.) / 2.;
+
+    // sample pixel depths above and beside current pixel
+    diff += clamp(getDepth(0, 1) - depth, 0.0, 1.0);    // top
+    diff += clamp(getDepth(1, 0) - depth, 0.0, 1.0);    // mid right
+    diff += clamp(getDepth(0, -1) - depth, 0.0, 1.0);   // bot
+    diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);   // mid left
+
+    // few more samples, this time diagonally adjacent
+    // diff += clamp(getDepth(1, 1) - depth, 0.0, 1.0);    // top right
+    // diff += clamp(getDepth(1, -1) - depth, 0.0, 1.0);   // bot right
+    // diff += clamp(getDepth(-1, -1) - depth, 0.0, 1.0);  // bot left
+    // diff += clamp(getDepth(-1, 1) - depth, 0.0, 1.0);   // top left
+
+    return floor(smoothstep(0.01, 0.02, diff) * 2.0) / 2.0;
 }
 
 float getNeighborDetail(int x, int y, float depth, vec3 normal) {
@@ -26,10 +37,10 @@ float getNeighborDetail(int x, int y, float depth, vec3 normal) {
     vec3 neighborNormal = getNormal(x, y);
     
     // Edge pixels should yield to faces who's normals are closer to the bias normal.
-    vec3 normalEdgeBias = vec3(1.0, 1.0, 1.0); // This should probably be a parameter.
+    vec3 normalEdgeBias = vec3(1.0, 1.0, 1.0);
     float normalDiff = dot(normal - neighborNormal, normalEdgeBias);
-    float normalIndicator = clamp(smoothstep(-0.01, 0.01, normalDiff), 0.0, 1.0);
-    
+    float normalIndicator = clamp(smoothstep(-0.01, 0.02, normalDiff), 0.0, 1.0);
+
     // Only the shallower pixel should detect the normal edge.
     float depthIndicator = clamp(sign(depthDiff * 0.25 + 0.0025), 0.0, 1.0);
 
@@ -59,19 +70,20 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
         }
 
         float outline = 0.0;
-        if (outlineStrength > 0.0) 
+        if (outlineStrength > 0.0)
             outline = getOutline(_depth);
 
-        float detail = 0.0; 
-        if (detailStrength > 0.0) 
+        float detail = 0.0;
+        if (detailStrength > 0.0)
             detail = getDetail(_depth, normal);
 
         float strength = outline > 0.0
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
+        // float strength = outline > 0.0 ? 0.0 : 1.0;
 
         // uv = resolution.xy * (floor(uv * resolution.zw) + 0.5);
-        outputColor = inputColor * strength;
+        outputColor = vec4(inputColor.rgb * strength, inputColor.a);
     #else
         outputColor = inputColor;
     #endif
