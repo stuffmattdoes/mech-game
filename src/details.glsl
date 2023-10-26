@@ -1,6 +1,6 @@
 uniform float detailStrength;
 uniform sampler2D tNormal;
-uniform sampler2D depthBuffer;
+// uniform sampler2D depthBuffer;
 uniform float outlineStrength;
 uniform vec4 resolution;
 
@@ -71,8 +71,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             : (1.0 + detailStrength * detail);
 
         // uv = resolution.xy * (floor(uv * resolution.zw) + 0.5);
-        outputColor = vec4(_depth, _depth, _depth, 1.0);
-        // outputColor = inputColor * strength;
+        outputColor = inputColor * strength;
     #else
         outputColor = inputColor;
     #endif
