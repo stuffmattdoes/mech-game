@@ -1,9 +1,8 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, NearestFilter, RGBAFormat, Uniform, Vector2, Vector3, Vector4 } from 'three';
+import { Uniform, Vector2, Vector4 } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
-import { useDepthBuffer } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 // import fragmentShader from './pixelize.frag';
 
@@ -13,12 +12,13 @@ import { useThree } from '@react-three/fiber';
 const fragmentShader = `
 uniform float detailStrength;
 uniform sampler2D tNormal;
-uniform sampler2D tDepth;
+// uniform sampler2D tDepth;
+// uniform sampler2D depthBuffer;
 uniform float outlineStrength;
 uniform vec4 resolution;
 
 float getDepth(int x, int y) {
-    return texture2D(tDepth, vUv + vec2(x, y) * resolution.zw).r;
+    return texture2D(depthBuffer, vUv + vec2(x, y) * resolution.zw).r;
 }
 
 vec3 getNormal(int x, int y) {
@@ -34,7 +34,7 @@ float getOutline(float depth) {
     return floor(smoothstep(0.01, 0.02, diff) * 2.) / 2.;
 }
 
-float getDetail(int x, int y, float depth, vec3 normal) {
+float getNeighborDetail(int x, int y, float depth, vec3 normal) {
     float depthDiff = getDepth(x, y) - depth;
     vec3 neighborNormal = getNormal(x, y);
     
@@ -49,13 +49,13 @@ float getDetail(int x, int y, float depth, vec3 normal) {
     return (1.0 - dot(normal, neighborNormal)) * depthIndicator * normalIndicator;
 }
 
-float normalEdgeIndicator(float depth, vec3 normal) {
+float getDetail(float depth, vec3 normal) {
     float indicator = 0.0;
 
-    indicator += getDetail(0, -1, depth, normal);
-    indicator += getDetail(0, 1, depth, normal);
-    indicator += getDetail(-1, 0, depth, normal);
-    indicator += getDetail(1, 0, depth, normal);
+    indicator += getNeighborDetail(0, -1, depth, normal);
+    indicator += getNeighborDetail(0, 1, depth, normal);
+    indicator += getNeighborDetail(-1, 0, depth, normal);
+    indicator += getNeighborDetail(1, 0, depth, normal);
 
     return step(0.1, indicator);
 }
@@ -66,23 +66,25 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
         float _depth = 0.0;
 
         if (outlineStrength > 0.0 || detailStrength > 0.0) {
+            // _depth = getDepth(0, 0);
             _depth = depth;
             normal = getNormal(0, 0);
         }
 
+		// Figure out depth packing. Depth is still 0 - 1
         float outline = 0.0;
         if (outlineStrength > 0.0) 
-            outline = getOutline(depth);
+            outline = getOutline(_depth);
 
         float detail = 0.0; 
         if (detailStrength > 0.0) 
-            detail = normalEdgeIndicator(depth, normal);
+            detail = getDetail(_depth, normal);
 
         float strength = outline > 0.0
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-		// uv = resolution.xy * (floor(uv * resolution.zw) + 0.5);
+        // uv = resolution.xy * (floor(uv * resolution.zw) + 0.5);
         outputColor = inputColor * strength;
     #else
         outputColor = inputColor;
@@ -97,7 +99,7 @@ export class PixelationEffect extends Effect {
 		detailStrength: number,
 		outlineStrength: number,
 		normals: Texture,
-		depthTexture: DepthTexture,
+		// depthTexture: DepthTexture,
 		resolution: Vector2
 	) {
 		super(
@@ -109,7 +111,7 @@ export class PixelationEffect extends Effect {
 				// @ts-ignore
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
-					['tDepth', new Uniform(depthTexture)],
+					// ['tDepth', new Uniform(depthTexture)],
 					['tNormal', new Uniform(normals)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(new Vector4(
@@ -151,14 +153,9 @@ type PixelizeProps = {
 export const Pixelize = forwardRef<PixelationEffect, PixelizeProps>(({ details, enabled, granularity, outlines }, ref) => {
 	const { normalPass } = useContext(EffectComposerContext);
 	const { size } = useThree();
-	const depthTexture = useDepthBuffer({
-		size: size.width,
-		// size: 256, // Size of the FBO, 256 by default
-		// frames: Infinity, // How many frames it renders, Infinity by default
-	  });
+	// const depthTexture = useDepthBuffer({ size: size.width });
 	const effect = useMemo(() =>
-		new PixelationEffect(enabled, granularity, details, outlines, normalPass?.texture!, depthTexture, new Vector2(size.width, size.height)),
-		[details, enabled, granularity, normalPass, outlines, depthTexture]);
-
+		new PixelationEffect(enabled, granularity, details, outlines, normalPass?.texture!, new Vector2(size.width, size.height)),
+		[details, enabled, granularity, normalPass, outlines, size]);
 	return <primitive ref={ref} object={effect} dispose={null} />;
 });

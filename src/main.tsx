@@ -41,7 +41,7 @@ function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
 		granularity: { min: 0, max: 16, step: 1, value: 8 },
-    outlines: { min: 0, max: 2.0, step: 0.2, value: 2.0 },
+    outlines: { min: 0, max: 1.0, step: 0.2, value: 1.0 },
     details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
 	});
 
