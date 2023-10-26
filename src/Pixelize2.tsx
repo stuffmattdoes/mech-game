@@ -1,5 +1,5 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, Uniform, Vector2, Vector3, Vector4 } from 'three';
+import { DepthTexture, NearestFilter, RGBAFormat, Uniform, Vector2, Vector3, Vector4 } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
@@ -11,88 +11,83 @@ import { useThree } from '@react-three/fiber';
 // About webgl shader variables https://threejs.org/docs/index.html#api/en/renderers/webgl/WebGLProgram
 
 const fragmentShader = `
-	uniform float detailStrength;
-	uniform sampler2D tNormal;
-	uniform sampler2D tDepth;
-	uniform float outlineStrength;
-	// uniform vec4 resolution;
-	
-	float getDepth(int x, int y) {
-		return texture2D(tDepth, vUv + vec2(x, y) * resolution.xy).r;
-	}
-	
-	vec3 getNormal(int x, int y) {
-		return texture2D(tNormal, vUv + vec2(x, y) * resolution.xy).rgb * 2.0 - 1.0;
-	}
+uniform float detailStrength;
+uniform sampler2D tNormal;
+uniform sampler2D tDepth;
+uniform float outlineStrength;
+uniform vec4 resolution;
 
-	float getOutline(float depth) {
-		float diff = 0.0;
-		diff += clamp(getDepth(1, 0) - depth, 0.0, 1.0);
-		diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);
-		diff += clamp(getDepth(0, 1) - depth, 0.0, 1.0);
-		diff += clamp(getDepth(0, -1) - depth, 0.0, 1.0);
-		return floor(smoothstep(0.01, 0.02, diff) * 2.) / 2.;
-	}
+float getDepth(int x, int y) {
+    return texture2D(tDepth, vUv + vec2(x, y) * resolution.zw).r;
+}
 
-	float neighborNormalEdgeIndicator(int x, int y, float depth, vec3 normal) {
-		float depthDiff = getDepth(x, y) - depth;
-		vec3 neighborNormal = getNormal(x, y);
-		
-		// Edge pixels should yield to faces who's normals are closer to the bias normal.
-		vec3 normalEdgeBias = vec3(1., 1., 1.); // This should probably be a parameter.
-		float normalDiff = dot(normal - neighborNormal, normalEdgeBias);
-		float normalIndicator = clamp(smoothstep(-.01, .01, normalDiff), 0.0, 1.0);
-		
-		// Only the shallower pixel should detect the normal edge.
-		float depthIndicator = clamp(sign(depthDiff * .25 + .0025), 0.0, 1.0);
+vec3 getNormal(int x, int y) {
+    return texture2D(tNormal, vUv + vec2(x, y) * resolution.zw).rgb * 2.0 - 1.0;
+}
 
-		return (1.0 - dot(normal, neighborNormal)) * depthIndicator * normalIndicator;
-	}
+float getOutline(float depth) {
+    float diff = 0.0;
+    diff += clamp(getDepth(1, 0) - depth, 0.0, 1.0);
+    diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);
+    diff += clamp(getDepth(0, 1) - depth, 0.0, 1.0);
+    diff += clamp(getDepth(0, -1) - depth, 0.0, 1.0);
+    return floor(smoothstep(0.01, 0.02, diff) * 2.) / 2.;
+}
 
-	float normalEdgeIndicator(float depth, vec3 normal) {
-		float indicator = 0.0;
+float getDetail(int x, int y, float depth, vec3 normal) {
+    float depthDiff = getDepth(x, y) - depth;
+    vec3 neighborNormal = getNormal(x, y);
+    
+    // Edge pixels should yield to faces who's normals are closer to the bias normal.
+    vec3 normalEdgeBias = vec3(1.0, 1.0, 1.0); // This should probably be a parameter.
+    float normalDiff = dot(normal - neighborNormal, normalEdgeBias);
+    float normalIndicator = clamp(smoothstep(-0.01, 0.01, normalDiff), 0.0, 1.0);
+    
+    // Only the shallower pixel should detect the normal edge.
+    float depthIndicator = clamp(sign(depthDiff * 0.25 + 0.0025), 0.0, 1.0);
 
-		indicator += neighborNormalEdgeIndicator(0, -1, depth, normal);
-		indicator += neighborNormalEdgeIndicator(0, 1, depth, normal);
-		indicator += neighborNormalEdgeIndicator(-1, 0, depth, normal);
-		indicator += neighborNormalEdgeIndicator(1, 0, depth, normal);
+    return (1.0 - dot(normal, neighborNormal)) * depthIndicator * normalIndicator;
+}
 
-		return step(0.1, indicator);
-	}
+float normalEdgeIndicator(float depth, vec3 normal) {
+    float indicator = 0.0;
 
-	void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
-		#ifdef ENABLED
-			// vec4 texel = texture2D( tDiffuse, vUv );
-			// float depth = 0.0;
-			// vec3 normal = vec3(0.0);
-			vec3 normal = texture2D(tNormal, uv).rgb;
+    indicator += getDetail(0, -1, depth, normal);
+    indicator += getDetail(0, 1, depth, normal);
+    indicator += getDetail(-1, 0, depth, normal);
+    indicator += getDetail(1, 0, depth, normal);
 
-			// if (outlineStrength > 0.0 || detailStrength > 0.0) {
-			// 	depth = getDepth(0, 0);
-			// 	normal = getNormal(0, 0);
-			// }
+    return step(0.1, indicator);
+}
 
-			float outline = 0.0;
-			if (outlineStrength > 0.0) 
-				outline = getOutline(depth);
+void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
+    #ifdef ENABLED
+        vec3 normal = vec3(0.0);
+        float _depth = 0.0;
 
-			float detail = 0.0; 
-			if (detailStrength > 0.0) 
-				detail = normalEdgeIndicator(depth, normal);
+        if (outlineStrength > 0.0 || detailStrength > 0.0) {
+            _depth = depth;
+            normal = getNormal(0, 0);
+        }
 
-			float strength = outline > 0.0
-				? (1.0 - outlineStrength * outline)
-				: (1.0 + detailStrength * detail);
+        float outline = 0.0;
+        if (outlineStrength > 0.0) 
+            outline = getOutline(depth);
 
-			outputColor = inputColor * strength;
+        float detail = 0.0; 
+        if (detailStrength > 0.0) 
+            detail = normalEdgeIndicator(depth, normal);
 
-			// "texture2D(tDepth, uv)" is equal to "depth"
-			// outputColor = inputColor * texture2D(tDepth, uv).r;
-			// outputColor = inputColor * texture2D(tNormal, uv) * depth;
-		#else
-			outputColor = inputColor;
-		#endif
-	}
+        float strength = outline > 0.0
+            ? (1.0 - outlineStrength * outline)
+            : (1.0 + detailStrength * detail);
+
+		// uv = resolution.xy * (floor(uv * resolution.zw) + 0.5);
+        outputColor = inputColor * strength;
+    #else
+        outputColor = inputColor;
+    #endif
+}
 `;
 
 export class PixelationEffect extends Effect {
@@ -117,12 +112,12 @@ export class PixelationEffect extends Effect {
 					['tDepth', new Uniform(depthTexture)],
 					['tNormal', new Uniform(normals)],
 					['outlineStrength', new Uniform(outlineStrength)],
-					// ['resolution', new Uniform(new Vector4(
-					// 	resolution.x,
-					// 	resolution.y,
-					// 	1.0 / resolution.x,
-					// 	1.0 / resolution.y,
-					// ))]
+					['resolution', new Uniform(new Vector4(
+						resolution.x,
+						resolution.y,
+						1.0 / resolution.x,
+						1.0 / resolution.y,
+					))]
 				])
 			}
 		);
@@ -156,13 +151,14 @@ type PixelizeProps = {
 export const Pixelize = forwardRef<PixelationEffect, PixelizeProps>(({ details, enabled, granularity, outlines }, ref) => {
 	const { normalPass } = useContext(EffectComposerContext);
 	const { size } = useThree();
-
-	const depthBuffer = useDepthBuffer({
+	const depthTexture = useDepthBuffer({
+		size: size.width,
 		// size: 256, // Size of the FBO, 256 by default
 		// frames: Infinity, // How many frames it renders, Infinity by default
 	  });
 	const effect = useMemo(() =>
-		new PixelationEffect(enabled, granularity, details, outlines, normalPass?.texture!, depthBuffer, new Vector2(size.width, size.height)),
-		[details, enabled, granularity, normalPass, outlines, depthBuffer]);
+		new PixelationEffect(enabled, granularity, details, outlines, normalPass?.texture!, depthTexture, new Vector2(size.width, size.height)),
+		[details, enabled, granularity, normalPass, outlines, depthTexture]);
+
 	return <primitive ref={ref} object={effect} dispose={null} />;
 });
