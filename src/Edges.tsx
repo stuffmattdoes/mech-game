@@ -5,20 +5,20 @@ import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
 import { useThree } from '@react-three/fiber';
 // @ts-ignore
-import detailShader from './details.glsl';
-import { useDepthBuffer } from '@react-three/drei';
+import detailShader from './edges.glsl';
+// import { useDepthBuffer } from '@react-three/drei';
 
 // This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
 // About webgl shader variables https://threejs.org/docs/index.html#api/en/renderers/webgl/WebGLProgram
 
-export class PixelationEffect extends Effect {
+class EdgeEffect extends Effect {
 	constructor(
 		enabled: boolean = true,
 		granularity: number = 30.0,
 		detailStrength: number,
 		outlineStrength: number,
 		normals: Texture,
-		depthTexture: DepthTexture,
+		// depthTexture: DepthTexture,
 		resolution: Vector2
 	) {
 		super(
@@ -30,7 +30,7 @@ export class PixelationEffect extends Effect {
 				// @ts-ignore
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
-					['depthBuffer', new Uniform(depthTexture)],
+					// ['depthBuffer', new Uniform(depthTexture)],
 					['tNormal', new Uniform(normals)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(new Vector4(
@@ -62,26 +62,26 @@ export class PixelationEffect extends Effect {
 	}
 }
 
-type PixelizeProps = {
+type EdgeProps = {
 	details: number,
 	enabled: boolean,
 	granularity: number,
 	outlines: number
 }
 
-export const Pixelize = forwardRef<PixelationEffect, PixelizeProps>(({ details, enabled, granularity, outlines }, ref) => {
+export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
 	const { normalPass } = useContext(EffectComposerContext);
 	const { size } = useThree();
-	const depthTexture = useDepthBuffer({ size: size.width });
+	// const depthTexture = useDepthBuffer({ size: size.width });
 
 	// depthTexture.format = pixelFormat
-    depthTexture.minFilter = NearestFilter;
-    depthTexture.magFilter = NearestFilter;
-    depthTexture.generateMipmaps = false;
+    // depthTexture.minFilter = NearestFilter;
+    // depthTexture.magFilter = NearestFilter;
+    // depthTexture.generateMipmaps = false;
     // depthTexture.stencilBuffer = false
 
 	const effect = useMemo(() =>
-		new PixelationEffect(enabled, granularity, details, outlines, normalPass?.texture!, depthTexture, new Vector2(size.width, size.height)),
+		new EdgeEffect(enabled, granularity, details, outlines, normalPass?.texture!, new Vector2(size.width, size.height)),
 		[details, enabled, granularity, normalPass, outlines, size]);
 	return <primitive ref={ref} object={effect} dispose={null} />;
 });

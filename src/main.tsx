@@ -9,7 +9,7 @@ import { EffectComposer, Pixelation } from '@react-three/postprocessing';
 import './styles.css';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
-import { Pixelize } from './Pixelize2';
+import { Edges } from './Edges';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -41,13 +41,13 @@ function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
 		granularity: { min: 0, max: 16, step: 1, value: 8 },
-    outlines: { min: 0, max: 1.0, step: 0.1, value: 1.0 },
-    details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.3 },
+    details: { min: 0, max: 2.0, step: 0.2, value: 0.4 },
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
     <renderPass/>
-    <Pixelize {...controls}/>
+    <Edges {...controls}/>
     {/* <Pixelation granularity={granularity}/> */}
   </EffectComposer>
 }

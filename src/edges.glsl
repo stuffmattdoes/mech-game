@@ -1,6 +1,5 @@
 uniform float detailStrength;
 uniform sampler2D tNormal;
-uniform sampler2D depthBuffer;
 // uniform sampler2D depthBuffer;
 uniform float outlineStrength;
 uniform vec4 resolution;
