@@ -1,26 +1,20 @@
 import React, { PropsWithChildren, Suspense, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Color, NearestFilter, RepeatWrapping, Vector2, Vector4 } from 'three';
-import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer, Pixelation } from '@react-three/postprocessing';
 // import { Pixelate } from './Pixelate';
 // import { blurShader } from './shaders';
 import './styles.css';
 import { useControls } from 'leva';
-import { RenderPass } from 'three-stdlib';
+// import { RenderPass } from 'three-stdlib';
 import { Edges } from './Edges';
 import { Pixels } from './Pixelize';
 
 const NODE_ENV = process.env.NODE_ENV;
 
-extend({ RenderPass });
-
-const screenResolution = new Vector2(window.innerWidth, window.innerHeight);
-const renderResolution = screenResolution.clone().divideScalar(6);
-renderResolution.x |= 0;
-renderResolution.y |= 0;
-const aspectRatio = screenResolution.x / screenResolution.y;
+// extend({ RenderPass });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -41,9 +35,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 0, max: 16, step: 1, value: 16 },
-    outlines: { min: 0, max: 1.0, step: 0.1, value: 1.0 },
-    details: { min: 0, max: 2.0, step: 0.2, value: 2.0},
+		granularity: { min: 0, max: 16, step: 1, value: 8 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.3 },
+    details: { min: 0, max: 2.0, step: 0.2, value: 0.4 },
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
@@ -60,6 +54,14 @@ function Loader() {
 }
 
 function Environment() {
+  const { size } = useThree();
+  const aspectRatio = size.width / size.height;
+
+  // size.width / -2,
+  //   size.width / 2,
+  //   size.height / 2,
+  //   size.height / -2,
+
   return <>
     <OrthographicCamera
       bottom={-1}
@@ -67,6 +69,7 @@ function Environment() {
       left={-aspectRatio}
       makeDefault
       near={0.1}
+      onUpdate={console.log}
       position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
       right={aspectRatio}
       top={1}
@@ -80,6 +83,16 @@ function Environment() {
       color={0x2d3645}
       intensity={.4}
     />
+    {/* <spotLight
+      angle={Math.PI / 6}
+      castShadow
+      color={0xff8800}
+      decay={2}
+      distance={10}
+      intensity={1}
+      penumbra={.02}
+      position={[0, 1, 0]}
+    /> */}
     <directionalLight
       castShadow
       intensity={0.8}
@@ -97,24 +110,11 @@ function Environment() {
 function Scene() {
   return <scene>
     <Gem position={[0, 0.5, .25]}>
-      {/* <spotLight
-        angle={Math.PI / 4}
-        castShadow
-        color={0xff8800}
-        decay={2}
-        distance={10}
-        intensity={1}
-        penumbra={.02}
-        position={[0, 0, 0]}
-        // target={[0, 0, 0]}
-      /> */}
       <pointLight
-        // args={[new Color(0x2379cf), 2.0, 20, .2]}
         color={0x2379cf}
-        decay={.2}
+        decay={1}
         distance={4}
         intensity={2}
-        // decay={20}
         // castShadow
       />
     </Gem>
