@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef } from 'react';
+import React, { PropsWithChildren, Suspense, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Color, NearestFilter, RepeatWrapping, Vector2, Vector4 } from 'three';
 import { Canvas, extend, useFrame } from '@react-three/fiber';
@@ -41,15 +41,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 0, max: 16, step: 1, value: 8 },
-    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.3 },
-    details: { min: 0, max: 2.0, step: 0.2, value: 0.4 },
+		granularity: { min: 0, max: 16, step: 1, value: 16 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 1.0 },
+    details: { min: 0, max: 2.0, step: 0.2, value: 2.0},
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
     {/* <renderPass/> */}
     <Edges {...controls}/>
-    <Pixelation granularity={controls.granularity}/>
+    {/* <Pixelation granularity={controls.granularity}/> */}
     {/* <Pixels {...controls}/> */}
   </EffectComposer>
 }
@@ -78,10 +78,11 @@ function Environment() {
     /> */}
     <ambientLight
       color={0x2d3645}
-      intensity={10}
+      intensity={.4}
     />
     <directionalLight
       castShadow
+      intensity={0.8}
       color={0xfffc9c}
       position={[60, 50, 100]}
       // shadow-mapsize={{ mapSize: [2048, 2048]}}
@@ -95,9 +96,28 @@ function Environment() {
 
 function Scene() {
   return <scene>
-    <Gem
-      position={[0, 0.5, .25]}
-    />
+    <Gem position={[0, 0.5, .25]}>
+      {/* <spotLight
+        angle={Math.PI / 4}
+        castShadow
+        color={0xff8800}
+        decay={2}
+        distance={10}
+        intensity={1}
+        penumbra={.02}
+        position={[0, 0, 0]}
+        // target={[0, 0, 0]}
+      /> */}
+      <pointLight
+        // args={[new Color(0x2379cf), 2.0, 20, .2]}
+        color={0x2379cf}
+        decay={.2}
+        distance={4}
+        intensity={2}
+        // decay={20}
+        // castShadow
+      />
+    </Gem>
     <Box
       position={[.4, 0.4 / 2, 0]}
       rotation={[0, Math.PI / 4, 0]}
@@ -145,11 +165,12 @@ function Box({
   </mesh>
 }
 
-function Gem({
+const Gem: React.FC<PropsWithChildren<IGameObject>> = ({
+  children,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   scale = [1, 1, 1]
-}: IGameObject) {
+}) => {
   const meshRef = React.useRef<any>();
   const materialRef = React.useRef<any>();
 
@@ -175,7 +196,7 @@ function Gem({
       specular: 0xffffff,
     }]}
       ref={materialRef} />
-    <pointLight args={[new Color(0x2379cf), .5, 0, 2]} />
+      {children}
   </mesh>
 }
 
