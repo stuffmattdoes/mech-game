@@ -15,7 +15,7 @@ import { useFBO } from '@react-three/drei';
 class EdgeEffect extends Effect {
 	constructor(
 		enabled: boolean = true,
-		granularity: number = 30.0,
+		// granularity: number = 30.0,
 		detailStrength: number,
 		outlineStrength: number,
 		resolution: Vector2,
@@ -36,7 +36,7 @@ class EdgeEffect extends Effect {
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
 					// ['tDepth', new Uniform(depthTexture)],
-					['granularity', new Uniform(granularity)],
+					// ['granularity', new Uniform(granularity)],
 					// ['tInput', new Uniform(renderTarget)],
 					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
@@ -131,7 +131,7 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 	const effect = useMemo(() =>
 		new EdgeEffect(
 			enabled,
-			granularity,
+			// granularity,
 			details,
 			outlines,
 			resolution,

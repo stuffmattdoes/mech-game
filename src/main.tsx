@@ -98,10 +98,10 @@ function Environment() {
       intensity={0.8}
       color={0xfffc9c}
       position={[60, 50, 100]}
-      // shadow-mapsize={{ mapSize: [2048, 2048]}}
+      // shadow-blurSamples={0}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
-    // shadow-blurSamples={0}
+      // shadow-radius={0}
     />
     <OrbitControls />
   </>
