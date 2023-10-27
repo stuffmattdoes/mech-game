@@ -6,7 +6,8 @@ import { EffectComposerContext } from '@react-three/postprocessing';
 import { useFrame, useThree } from '@react-three/fiber';
 // @ts-ignore
 import detailShader from './edges.glsl';
-import { useFBO } from '@react-three/drei';
+import { useDepthBuffer, useFBO } from '@react-three/drei';
+import { texture } from 'three/examples/jsm/nodes/Nodes.js';
 // import { useDepthBuffer } from '@react-three/drei';
 
 // This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
@@ -19,7 +20,7 @@ class EdgeEffect extends Effect {
 		detailStrength: number,
 		outlineStrength: number,
 		resolution: Vector2,
-		// renderTarget:  WebGLRenderTarget<Texture>,
+		renderTexture:  Texture,
 		normalTexture: Texture,
 		// depthTexture: null,
 	) {
@@ -37,7 +38,7 @@ class EdgeEffect extends Effect {
 					['detailStrength', new Uniform(detailStrength)],
 					// ['tDepth', new Uniform(depthTexture)],
 					// ['granularity', new Uniform(granularity)],
-					// ['tInput', new Uniform(renderTarget)],
+					['tInput', new Uniform(renderTexture)],
 					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(new Vector4(
@@ -100,6 +101,9 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 	const { size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
 	const { normalPass } = useContext(EffectComposerContext);
+	if (!normalPass)
+		return null;
+
 	// normalPass!.texture.format = RGBAFormat;
     // normalPass!.texture.minFilter = NearestFilter;
     // normalPass!.texture.magFilter = NearestFilter;
@@ -115,18 +119,20 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 	// console.log(resolution);
 	// console.log(normalRenderTarget);
 
-	// const renderTarget = useFBO({
-	// 	generateMipmaps: false,
-	// 	magFilter: NearestFilter,
-	// 	minFilter: NearestFilter,
-	// 	stencilBuffer: false,
-	// 	depthBuffer: true
-	// });
-	// useFrame((state) => {
-	// 	state.gl.setRenderTarget(renderTarget);
-	// 	state.gl.render(state.scene, state.camera);
-	// 	state.gl.setRenderTarget(null);
-	// });
+	const renderTexture = useFBO({
+		generateMipmaps: false,
+		magFilter: NearestFilter,
+		minFilter: NearestFilter,
+		stencilBuffer: false,
+		depthBuffer: true
+	});
+	renderTexture.setSize(resolution.x, resolution.y);
+	console.log('renderTarget', renderTexture);
+	useFrame((state) => {
+		state.gl.setRenderTarget(renderTexture);
+		state.gl.render(state.scene, state.camera);
+		state.gl.setRenderTarget(null);
+	});
 
 	const effect = useMemo(() =>
 		new EdgeEffect(
@@ -135,32 +141,30 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 			details,
 			outlines,
 			resolution,
-			// renderTarget,
-			normalPass?.texture!,
-			// normalRenderTarget.texture,
-			// renderTarget
+			renderTexture.texture,
+			normalPass.texture
 		),
 		[details, enabled, granularity, outlines, resolution]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
 
-// function pixelRenderTarget( resolution: THREE.Vector2, pixelFormat: THREE.PixelFormat, depthTexture: boolean ) {
-//     const renderTarget = new WebGLRenderTarget(
-//         resolution.x, resolution.y,
-//         !depthTexture ?
-//             undefined
-//             : {
-//                 depthTexture: new DepthTexture(
-//                     resolution.x,
-//                     resolution.y
-//                 ),
-//                 depthBuffer: true
-//             }
-//     )
-//     renderTarget.texture.format = pixelFormat
-//     renderTarget.texture.minFilter = NearestFilter
-//     renderTarget.texture.magFilter = NearestFilter
-//     renderTarget.texture.generateMipmaps = false
-//     renderTarget.stencilBuffer = false
-//     return renderTarget
-// }
+function pixelRenderTarget( resolution: THREE.Vector2, pixelFormat: THREE.PixelFormat, depthTexture: boolean ) {
+    const renderTarget = new WebGLRenderTarget(
+        resolution.x, resolution.y,
+        !depthTexture ?
+            undefined
+            : {
+                depthTexture: new DepthTexture(
+                    resolution.x,
+                    resolution.y
+                ),
+                depthBuffer: true
+            }
+    )
+    renderTarget.texture.format = pixelFormat
+    renderTarget.texture.minFilter = NearestFilter
+    renderTarget.texture.magFilter = NearestFilter
+    renderTarget.texture.generateMipmaps = false
+    renderTarget.stencilBuffer = false
+    return renderTarget
+}
