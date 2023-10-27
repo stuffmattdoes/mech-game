@@ -1,13 +1,12 @@
 uniform float detailStrength;
-uniform float granularity;
+// uniform float granularity;
 uniform sampler2D tNormal;
-// uniform sampler2D depthBuffer;
-// uniform sampler2D renderTarget;
+// uniform sampler2D tDepth;
+// uniform sampler2D tInput;
 uniform float outlineStrength;
 uniform vec4 resolution;
 
 float getDepth(int x, int y) {
-    // samples depth buffer 
     return texture2D(depthBuffer, vUv + vec2(x, y) * resolution.zw).r;
 }
 
@@ -61,17 +60,7 @@ float getDetail(float depth, vec3 normal) {
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
     #ifdef ENABLED
-        vec2 d = vec2(
-            1.0 / resolution.x,
-            1.0 / resolution.y
-        ).xy;
-        // d *= granularity;
-        // downsampled UV
-        vec2 dUv = vec2(
-            d.x * floor(uv.x / d.x),
-            d.y * floor(uv.y / d.y)
-        );
-        vec4 texel = texture2D(inputBuffer, dUv);
+        // vec4 texel = texture2D(tInput, uv);
 
         vec3 normal = vec3(0.0);
         float _depth = 0.0;
@@ -93,7 +82,8 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-        outputColor = vec4(texel.rgb * strength, inputColor.a);
+        // outputColor = vec4(texel.rgb * strength, inputColor.a);
+        outputColor = vec4(inputColor.rgb * strength, inputColor.a);
     #else
         outputColor = inputColor;
     #endif

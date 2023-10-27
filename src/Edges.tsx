@@ -18,9 +18,10 @@ class EdgeEffect extends Effect {
 		granularity: number = 30.0,
 		detailStrength: number,
 		outlineStrength: number,
-		normals: Texture,
 		resolution: Vector2,
-		// renderTarget:  WebGLRenderTarget<Texture>
+		// renderTarget:  WebGLRenderTarget<Texture>,
+		normalTexture: Texture,
+		// depthTexture: null,
 	) {
 		super(
 			'EdgeShader',
@@ -34,10 +35,10 @@ class EdgeEffect extends Effect {
 				// @ts-ignore
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
-					// ['depthBuffer', new Uniform(depthTexture)],
+					// ['tDepth', new Uniform(depthTexture)],
 					['granularity', new Uniform(granularity)],
-					// ['renderTarget', new Uniform(renderTarget)],
-					['tNormal', new Uniform(normals)],
+					// ['tInput', new Uniform(renderTarget)],
+					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(new Vector4(
 						resolution.x,
@@ -97,8 +98,13 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 		3. Update textures every frame with useFrame(...)
 	*/
 	const { size } = useThree();
-	const { normalPass } = useContext(EffectComposerContext);
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
+	const { normalPass } = useContext(EffectComposerContext);
+	// normalPass!.texture.format = RGBAFormat;
+    // normalPass!.texture.minFilter = NearestFilter;
+    // normalPass!.texture.magFilter = NearestFilter;
+    // normalPass!.texture.generateMipmaps = false;
+	
 	// const normalRenderTarget = pixelRenderTarget(resolution, RGBAFormat, false);
 	// normalRenderTarget.texture.format = RGBAFormat;
 	// normalRenderTarget.depthBuffer = false;
@@ -128,12 +134,13 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 			granularity,
 			details,
 			outlines,
+			resolution,
+			// renderTarget,
 			normalPass?.texture!,
 			// normalRenderTarget.texture,
-			resolution,
 			// renderTarget
 		),
-		[details, enabled, granularity, normalPass, outlines, size]);
+		[details, enabled, granularity, outlines, resolution]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
 
