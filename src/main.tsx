@@ -35,9 +35,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 1, max: 32, step: 1, value: 8 },
-    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.3 },
-    details: { min: 0, max: 2.0, step: 0.2, value: 0.4 },
+		granularity: { min: 1, max: 32, step: 1, value: 12 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.0 },
+    details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
