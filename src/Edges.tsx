@@ -21,6 +21,7 @@ class EdgeEffect extends Effect {
 		outlineStrength: number,
 		resolution: Vector2,
 		renderTexture:  Texture,
+		depthTexture: Texture,
 		normalTexture: Texture,
 		// depthTexture: null,
 	) {
@@ -36,9 +37,9 @@ class EdgeEffect extends Effect {
 				// @ts-ignore
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
-					// ['tDepth', new Uniform(depthTexture)],
+					['tDepth', new Uniform(depthTexture)],
 					// ['granularity', new Uniform(granularity)],
-					['tInput', new Uniform(renderTexture)],
+					['tDiffuse', new Uniform(renderTexture)],
 					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(new Vector4(
@@ -91,48 +92,35 @@ type EdgeProps = {
 
 export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
 	/*
-		1. Create downsampled textures:
-			* render texture - useFBO()
-			* depth texture - useDepthBuffer()
-			* normal texture - ???
-		2. Pass textures to new EdgeEffect(...)
-		3. Update textures every frame with useFrame(...)
+		1. [ ] Create downsampled textures:
+			* [x] render texture - useFBO()
+			* [ ] depth texture - useDepthBuffer()
+			* [x] normal texture - ???
+		2. [ ] Pass textures to new EdgeEffect(...)
+		3. [ ] Update textures every frame with useFrame(...)
 	*/
 	const { size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
-	const { normalPass } = useContext(EffectComposerContext);
-	if (!normalPass)
-		return null;
-
-	// normalPass!.texture.format = RGBAFormat;
-    // normalPass!.texture.minFilter = NearestFilter;
-    // normalPass!.texture.magFilter = NearestFilter;
-    // normalPass!.texture.generateMipmaps = false;
-	
-	// const normalRenderTarget = pixelRenderTarget(resolution, RGBAFormat, false);
-	// normalRenderTarget.texture.format = RGBAFormat;
-	// normalRenderTarget.depthBuffer = false;
-    // normalRenderTarget.texture.minFilter = NearestFilter;
-    // normalRenderTarget.texture.magFilter = NearestFilter;
-    // normalRenderTarget.texture.generateMipmaps = false;
-    // normalRenderTarget.stencilBuffer = false;
-	// console.log(resolution);
-	// console.log(normalRenderTarget);
-
 	const renderTexture = useFBO({
 		generateMipmaps: false,
 		magFilter: NearestFilter,
 		minFilter: NearestFilter,
 		stencilBuffer: false,
-		depthBuffer: true
+		depthBuffer: true,
+		depthTexture: new DepthTexture(resolution.x, resolution.y)
 	});
 	renderTexture.setSize(resolution.x, resolution.y);
-	console.log('renderTarget', renderTexture);
 	useFrame((state) => {
 		state.gl.setRenderTarget(renderTexture);
 		state.gl.render(state.scene, state.camera);
 		state.gl.setRenderTarget(null);
 	});
+	// const depthBuffer = useDepthBuffer({ size: resolution.x > resolution.y ? resolution.x : resolution.y });
+	console.log(renderTexture.depthTexture);
+	const { normalPass } = useContext(EffectComposerContext);
+	if (!normalPass)
+		return null;
+	normalPass.setSize(resolution.x, resolution.y);	
 
 	const effect = useMemo(() =>
 		new EdgeEffect(
@@ -142,29 +130,10 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 			outlines,
 			resolution,
 			renderTexture.texture,
+			renderTexture.depthTexture,
+			// depthBuffer,
 			normalPass.texture
 		),
 		[details, enabled, granularity, outlines, resolution]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
-
-function pixelRenderTarget( resolution: THREE.Vector2, pixelFormat: THREE.PixelFormat, depthTexture: boolean ) {
-    const renderTarget = new WebGLRenderTarget(
-        resolution.x, resolution.y,
-        !depthTexture ?
-            undefined
-            : {
-                depthTexture: new DepthTexture(
-                    resolution.x,
-                    resolution.y
-                ),
-                depthBuffer: true
-            }
-    )
-    renderTarget.texture.format = pixelFormat
-    renderTarget.texture.minFilter = NearestFilter
-    renderTarget.texture.magFilter = NearestFilter
-    renderTarget.texture.generateMipmaps = false
-    renderTarget.stencilBuffer = false
-    return renderTarget
-}

@@ -81,7 +81,7 @@ function Environment() {
     /> */}
     <ambientLight
       color={0x2d3645}
-      intensity={.4}
+      intensity={2}
     />
     {/* <spotLight
       angle={Math.PI / 6}

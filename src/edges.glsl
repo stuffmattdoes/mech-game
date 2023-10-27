@@ -1,13 +1,18 @@
+// built-in
+// uniform sampler2D inputBuffer;
+// uniform sampler2D depthBuffer;
+
+// custom
 uniform float detailStrength;
 // uniform float granularity;
 uniform sampler2D tNormal;
-// uniform sampler2D tDepth;
-uniform sampler2D tInput;
+uniform sampler2D tDepth;
+uniform sampler2D tDiffuse;
 uniform float outlineStrength;
 uniform vec4 resolution;
 
 float getDepth(int x, int y) {
-    return texture2D(depthBuffer, vUv + vec2(x, y) * resolution.zw).r;
+    return texture2D(tDepth, vUv + vec2(x, y) * resolution.zw).r;
 }
 
 vec3 getNormal(int x, int y) {
@@ -60,7 +65,7 @@ float getDetail(float depth, vec3 normal) {
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
     #ifdef ENABLED
-        vec4 texel = texture2D(tInput, uv);
+        vec4 texel = texture2D(tDiffuse, vUv);
 
         vec3 normal = vec3(0.0);
         float _depth = 0.0;
