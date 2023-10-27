@@ -1,5 +1,5 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, NearestFilter, Uniform, Vector2, Vector4, WebGLRenderTarget } from 'three';
+import { DepthTexture, NearestFilter, RGBAFormat, Uniform, Vector2, Vector4, WebGLRenderTarget, WebGLRenderer } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
@@ -20,7 +20,7 @@ class EdgeEffect extends Effect {
 		outlineStrength: number,
 		normals: Texture,
 		resolution: Vector2,
-		renderTarget:  WebGLRenderTarget<Texture>
+		// renderTarget:  WebGLRenderTarget<Texture>
 	) {
 		super(
 			'EdgeShader',
@@ -28,26 +28,38 @@ class EdgeEffect extends Effect {
 			{
 				attributes: EffectAttribute.DEPTH,
 				blendFunction: BlendFunction.NORMAL,
+				defines: new Map([
+					['ENABLED', String(enabled)]
+				]),
 				// @ts-ignore
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
 					// ['depthBuffer', new Uniform(depthTexture)],
-					['renderTarget', new Uniform(renderTarget)],
+					['granularity', new Uniform(granularity)],
+					// ['renderTarget', new Uniform(renderTarget)],
 					['tNormal', new Uniform(normals)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(new Vector4(
 						resolution.x,
 						resolution.y,
-						1.0 / resolution.x,
-						1.0 / resolution.y,
+						1 / resolution.x,
+						1 / resolution.y,
 					))]
 				])
 			}
 		);
 
-		this.enabled = enabled;
-		this.granularity = granularity;
+		// this.rgbRenderTarget = pixelRenderTarget( resolution, RGBAFormat, true);
+        // this.normalRenderTarget = pixelRenderTarget( resolution, RGBAFormat, false);
+
 		this.resolution = resolution;
+		this.enabled = enabled;
+		// this.granularity = granularity;
+	}
+
+	private set resolution(value: Vector2) {
+		this.setSize(value.x, value.y);
+		this.setChanged();
 	}
 
 	private set enabled(value: boolean) {
@@ -59,15 +71,13 @@ class EdgeEffect extends Effect {
 		this.setChanged();
 	}
 
-	private set granularity(value: number) {
-		this.defines.set('GRANULARITY', String(value));
-		// this.setSize()
-		// this.setChanged();
-	}
+	// update(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget<Texture>, deltaTime?: number | undefined): void {
+	// }
 
-	private set resolution(value: Vector2) {
-		this.setChanged();
-	}
+	// private set granularity(value: number) {
+	// 	this.uniforms.set('granularity', new Uniform(value));
+	// 	this.setChanged();
+	// }
 }
 
 type EdgeProps = {
@@ -78,22 +88,72 @@ type EdgeProps = {
 }
 
 export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
-	const { normalPass } = useContext(EffectComposerContext);
+	/*
+		1. Create downsampled textures:
+			* render texture - useFBO()
+			* depth texture - useDepthBuffer()
+			* normal texture - ???
+		2. Pass textures to new EdgeEffect(...)
+		3. Update textures every frame with useFrame(...)
+	*/
 	const { size } = useThree();
-	const renderTarget = useFBO({
-		generateMipmaps: false,
-		magFilter: NearestFilter,
-		minFilter: NearestFilter,
-		stencilBuffer: false
-	});
+	const { normalPass } = useContext(EffectComposerContext);
+	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
+	// const normalRenderTarget = pixelRenderTarget(resolution, RGBAFormat, false);
+	// normalRenderTarget.texture.format = RGBAFormat;
+	// normalRenderTarget.depthBuffer = false;
+    // normalRenderTarget.texture.minFilter = NearestFilter;
+    // normalRenderTarget.texture.magFilter = NearestFilter;
+    // normalRenderTarget.texture.generateMipmaps = false;
+    // normalRenderTarget.stencilBuffer = false;
+	// console.log(resolution);
+	// console.log(normalRenderTarget);
+
+	// const renderTarget = useFBO({
+	// 	generateMipmaps: false,
+	// 	magFilter: NearestFilter,
+	// 	minFilter: NearestFilter,
+	// 	stencilBuffer: false,
+	// 	depthBuffer: true
+	// });
 	// useFrame((state) => {
 	// 	state.gl.setRenderTarget(renderTarget);
 	// 	state.gl.render(state.scene, state.camera);
 	// 	state.gl.setRenderTarget(null);
 	// });
-	const resolution = new Vector2(size.width, size.height).divideScalar(granularity);
+
 	const effect = useMemo(() =>
-		new EdgeEffect(enabled, granularity, details, outlines, normalPass?.texture!, resolution, renderTarget),
+		new EdgeEffect(
+			enabled,
+			granularity,
+			details,
+			outlines,
+			normalPass?.texture!,
+			// normalRenderTarget.texture,
+			resolution,
+			// renderTarget
+		),
 		[details, enabled, granularity, normalPass, outlines, size]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
+
+// function pixelRenderTarget( resolution: THREE.Vector2, pixelFormat: THREE.PixelFormat, depthTexture: boolean ) {
+//     const renderTarget = new WebGLRenderTarget(
+//         resolution.x, resolution.y,
+//         !depthTexture ?
+//             undefined
+//             : {
+//                 depthTexture: new DepthTexture(
+//                     resolution.x,
+//                     resolution.y
+//                 ),
+//                 depthBuffer: true
+//             }
+//     )
+//     renderTarget.texture.format = pixelFormat
+//     renderTarget.texture.minFilter = NearestFilter
+//     renderTarget.texture.magFilter = NearestFilter
+//     renderTarget.texture.generateMipmaps = false
+//     renderTarget.stencilBuffer = false
+//     return renderTarget
+// }

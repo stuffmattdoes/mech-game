@@ -35,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 0, max: 16, step: 1, value: 8 },
+		granularity: { min: 1, max: 32, step: 1, value: 8 },
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.3 },
     details: { min: 0, max: 2.0, step: 0.2, value: 0.4 },
 	});
@@ -43,8 +43,8 @@ function Effects() {
   return <EffectComposer depthBuffer multisampling={0}>
     {/* <renderPass/> */}
     <Edges {...controls}/>
-    {/* <Pixelation granularity={controls.granularity}/> */}
     {/* <Pixels {...controls}/> */}
+    {/* <Pixelation granularity={controls.granularity}/> */}
   </EffectComposer>
 }
 
@@ -69,7 +69,7 @@ function Environment() {
       left={-aspectRatio}
       makeDefault
       near={0.1}
-      onUpdate={console.log}
+      // onUpdate={console.log}
       position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
       right={aspectRatio}
       top={1}

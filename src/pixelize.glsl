@@ -4,8 +4,16 @@ uniform float granularity;
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
     #ifdef ENABLED
-        vec2 iuv = (floor(resolution.xy * uv) + .5) * resolution.zw;
-        vec4 texel = texture2D(inputBuffer, iuv);
+        vec2 d = vec2(
+            1.0 / resolution.x,
+            1.0 / resolution.y
+        ).xy;
+        d *= granularity;
+        vec2 downSampledUv = vec2(
+            d.x * floor(uv.x / d.x),
+            d.y * floor(uv.y / d.y)
+        );
+        vec4 texel = texture2D(inputBuffer, downSampledUv);
         outputColor = texel;
     #else
         outputColor = inputColor;
