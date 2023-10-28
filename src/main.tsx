@@ -1,9 +1,9 @@
-import React, { PropsWithChildren, Suspense, useEffect, useRef } from 'react';
+import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Color, NearestFilter, RepeatWrapping, Vector2, Vector4 } from 'three';
+import { NearestFilter, RepeatWrapping } from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
-import { Bloom, EffectComposer, Pixelation } from '@react-three/postprocessing';
+import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
+import { EffectComposer } from '@react-three/postprocessing';
 import './styles.css';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
@@ -36,21 +36,10 @@ function Effects() {
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.0 },
     details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
 	});
-  const composerRef = useRef<typeof EffectComposer>();
-  // const { gl, setSize, size } = useThree();
-  // const { x, y } = new Vector2(size.width, size.height).divideScalar(controls.granularity);
 
-  // useFrame(() => {
-  //   composerRef.current?.setSize(x, y);
-  //   composerRef.current?.render();
-  // });
-
-  return <EffectComposer depthBuffer multisampling={0} ref={composerRef}>
+  return <EffectComposer depthBuffer multisampling={0}>
     <renderPass/>
     <Edges {...controls}/>
-    {/* <Pixels {...controls}/> */}
-    {/* <Bloom/> */}
-    {/* <Pixelation granularity={controls.granularity}/> */}
   </EffectComposer>
 }
 
