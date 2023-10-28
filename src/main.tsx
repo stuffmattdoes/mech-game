@@ -50,6 +50,8 @@ function Loader() {
 
 function Environment() {
   const { viewport } = useThree();
+  const thr =  useThree();
+  console.log(thr);
 
   useFrame(({ camera, viewport }) => {
     pixelCameraDolly(camera, viewport.aspect, 144, 120);
@@ -67,11 +69,6 @@ return <>
       right={viewport.aspect}
       top={1}
     />
-    {/* <PerspectiveCamera
-      fov={5}
-      makeDefault
-      position={[0, 8, 14]}
-    /> */}
     <ambientLight
       color={0x2d3645}
       intensity={2}
