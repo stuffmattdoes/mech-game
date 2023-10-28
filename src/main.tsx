@@ -50,8 +50,7 @@ function Loader() {
 
 function Environment() {
   const { viewport } = useThree();
-  const thr =  useThree();
-  console.log(thr);
+  // const thr =  useThree();
 
   useFrame(({ camera, viewport }) => {
     pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
