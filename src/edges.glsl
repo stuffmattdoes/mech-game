@@ -1,22 +1,22 @@
 // built-in
+// will throw error if you define here without also passing in custom uniform through app code
 // uniform sampler2D inputBuffer;
 // uniform sampler2D depthBuffer;
+uniform vec4 resolution;
 
 // custom
 uniform float detailStrength;
-// uniform float granularity;
-uniform sampler2D tNormal;
 uniform sampler2D tDepth;
 uniform sampler2D tDiffuse;
+uniform sampler2D tNormal;
 uniform float outlineStrength;
-uniform vec4 resolution;
 
 float getDepth(int x, int y) {
-    return texture2D(tDepth, vUv + vec2(x, y) * resolution.zw).r;
+    return texture2D(tDepth, vUv + vec2(x, y) * (1.0 / resolution.xy)).r;
 }
 
 vec3 getNormal(int x, int y) {
-    return texture2D(tNormal, vUv + vec2(x, y) * resolution.zw).rgb * 2.0 - 1.0;
+    return texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0;
 }
 
 float getOutline(float depth) {
@@ -65,6 +65,7 @@ float getDetail(float depth, vec3 normal) {
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
     #ifdef ENABLED
+        // vec4 texel = texture2D(inputBuffer, vUv);
         vec4 texel = texture2D(tDiffuse, vUv);
 
         vec3 normal = vec3(0.0);
@@ -87,8 +88,8 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-        outputColor = vec4(texel.rgb * strength, inputColor.a);
         // outputColor = vec4(inputColor.rgb * strength, inputColor.a);
+        outputColor = vec4(texel.rgb * strength, inputColor.a);
     #else
         outputColor = inputColor;
     #endif

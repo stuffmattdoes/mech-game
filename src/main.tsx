@@ -3,18 +3,15 @@ import ReactDOM from 'react-dom/client';
 import { Color, NearestFilter, RepeatWrapping, Vector2, Vector4 } from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, PerspectiveCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
-import { EffectComposer, Pixelation } from '@react-three/postprocessing';
-// import { Pixelate } from './Pixelate';
-// import { blurShader } from './shaders';
+import { Bloom, EffectComposer, Pixelation } from '@react-three/postprocessing';
 import './styles.css';
 import { useControls } from 'leva';
-// import { RenderPass } from 'three-stdlib';
+import { RenderPass } from 'three-stdlib';
 import { Edges } from './Edges';
-import { Pixels } from './Pixelize';
 
 const NODE_ENV = process.env.NODE_ENV;
 
-// extend({ RenderPass });
+extend({ RenderPass });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -39,11 +36,20 @@ function Effects() {
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.0 },
     details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
 	});
+  const composerRef = useRef<typeof EffectComposer>();
+  // const { gl, setSize, size } = useThree();
+  // const { x, y } = new Vector2(size.width, size.height).divideScalar(controls.granularity);
 
-  return <EffectComposer depthBuffer multisampling={0}>
-    {/* <renderPass/> */}
+  // useFrame(() => {
+  //   composerRef.current?.setSize(x, y);
+  //   composerRef.current?.render();
+  // });
+
+  return <EffectComposer depthBuffer multisampling={0} ref={composerRef}>
+    <renderPass/>
     <Edges {...controls}/>
     {/* <Pixels {...controls}/> */}
+    {/* <Bloom/> */}
     {/* <Pixelation granularity={controls.granularity}/> */}
   </EffectComposer>
 }
@@ -54,24 +60,18 @@ function Loader() {
 }
 
 function Environment() {
-  const { size } = useThree();
-  const aspectRatio = size.width / size.height;
+  const { viewport } = useThree();
 
-  // size.width / -2,
-  //   size.width / 2,
-  //   size.height / 2,
-  //   size.height / -2,
-
-  return <>
+return <>
     <OrthographicCamera
       bottom={-1}
       far={10}
-      left={-aspectRatio}
+      left={-viewport.aspect}
       makeDefault
       near={0.1}
       // onUpdate={console.log}
       position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
-      right={aspectRatio}
+      right={viewport.aspect}
       top={1}
     />
     {/* <PerspectiveCamera
@@ -114,7 +114,8 @@ function Scene() {
         color={0x2379cf}
         decay={1}
         distance={4}
-        intensity={2}
+        // intensity={2}
+        intensity={4}
         // castShadow
       />
     </Gem>

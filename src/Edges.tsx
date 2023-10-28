@@ -1,14 +1,12 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, NearestFilter, RGBAFormat, Uniform, Vector2, Vector4, WebGLRenderTarget, WebGLRenderer } from 'three';
+import { DepthTexture, NearestFilter, Uniform, Vector2, Vector4 } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
 import { useFrame, useThree } from '@react-three/fiber';
+import { useFBO } from '@react-three/drei';
 // @ts-ignore
 import detailShader from './edges.glsl';
-import { useDepthBuffer, useFBO } from '@react-three/drei';
-import { texture } from 'three/examples/jsm/nodes/Nodes.js';
-// import { useDepthBuffer } from '@react-three/drei';
 
 // This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
 // About webgl shader variables https://threejs.org/docs/index.html#api/en/renderers/webgl/WebGLProgram
@@ -16,14 +14,12 @@ import { texture } from 'three/examples/jsm/nodes/Nodes.js';
 class EdgeEffect extends Effect {
 	constructor(
 		enabled: boolean = true,
-		// granularity: number = 30.0,
 		detailStrength: number,
 		outlineStrength: number,
 		resolution: Vector2,
 		renderTexture:  Texture,
 		depthTexture: Texture,
-		normalTexture: Texture,
-		// depthTexture: null,
+		normalTexture: Texture
 	) {
 		super(
 			'EdgeShader',
@@ -38,31 +34,15 @@ class EdgeEffect extends Effect {
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
 					['tDepth', new Uniform(depthTexture)],
-					// ['granularity', new Uniform(granularity)],
 					['tDiffuse', new Uniform(renderTexture)],
 					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
-					['resolution', new Uniform(new Vector4(
-						resolution.x,
-						resolution.y,
-						1 / resolution.x,
-						1 / resolution.y,
-					))]
+					['resolution', new Uniform(resolution)]
 				])
 			}
 		);
 
-		// this.rgbRenderTarget = pixelRenderTarget( resolution, RGBAFormat, true);
-        // this.normalRenderTarget = pixelRenderTarget( resolution, RGBAFormat, false);
-
-		this.resolution = resolution;
 		this.enabled = enabled;
-		// this.granularity = granularity;
-	}
-
-	private set resolution(value: Vector2) {
-		this.setSize(value.x, value.y);
-		this.setChanged();
 	}
 
 	private set enabled(value: boolean) {
@@ -73,14 +53,6 @@ class EdgeEffect extends Effect {
 		// redundant since changing useControls param rerenders <EffectComponent/>
 		this.setChanged();
 	}
-
-	// update(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget<Texture>, deltaTime?: number | undefined): void {
-	// }
-
-	// private set granularity(value: number) {
-	// 	this.uniforms.set('granularity', new Uniform(value));
-	// 	this.setChanged();
-	// }
 }
 
 type EdgeProps = {
@@ -92,15 +64,12 @@ type EdgeProps = {
 
 export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
 	/*
-		1. [ ] Create downsampled textures:
-			* [x] render texture - useFBO()
-			* [ ] depth texture - useDepthBuffer()
-			* [x] normal texture - ???
-		2. [ ] Pass textures to new EdgeEffect(...)
-		3. [ ] Update textures every frame with useFrame(...)
+		1. Initial <shaderPass/> that downsamples texture, writes to output buffer
+		2. Follow up <effectPass/> which receives downsampled textures as inputBuffer
 	*/
 	const { size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
+
 	const renderTexture = useFBO({
 		generateMipmaps: false,
 		magFilter: NearestFilter,
@@ -110,6 +79,7 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 		depthTexture: new DepthTexture(resolution.x, resolution.y)
 	});
 	renderTexture.setSize(resolution.x, resolution.y);
+
 	useFrame((state) => {
 		state.gl.setRenderTarget(renderTexture);
 		state.gl.render(state.scene, state.camera);
@@ -124,15 +94,13 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 	const effect = useMemo(() =>
 		new EdgeEffect(
 			enabled,
-			// granularity,
 			details,
 			outlines,
 			resolution,
 			renderTexture.texture,
 			renderTexture.depthTexture,
-			// depthBuffer,
 			normalPass.texture
 		),
-		[details, enabled, granularity, outlines, resolution]);
+		[enabled, granularity, details, outlines, normalPass.texture]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
