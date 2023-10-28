@@ -54,7 +54,7 @@ function Environment() {
   console.log(thr);
 
   useFrame(({ camera, viewport }) => {
-    pixelCameraDolly(camera, viewport.aspect, 144, 120);
+    pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
   })
 
 return <>
@@ -191,11 +191,11 @@ const Gem: React.FC<PropsWithChildren<IGameObject>> = ({
 }
 
 function Plane() {
-  const texture = useTexture('textures/checker.png',
+  const texture = useTexture('textures/checker2.png',
     (tex) => {
       if (Array.isArray(tex))
         return tex;
-      // tex.repeat.set(3, 3);
+      tex.repeat.set(3, 3);
       tex.minFilter = NearestFilter;
       tex.magFilter = NearestFilter;
       tex.generateMipmaps = false;
