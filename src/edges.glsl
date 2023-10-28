@@ -72,7 +72,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
         float _depth = 0.0;
 
         if (outlineStrength > 0.0 || detailStrength > 0.0) {
-            _depth = depth;
+            _depth = getDepth(0, 0);
             normal = getNormal(0, 0);
         }
 

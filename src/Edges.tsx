@@ -4,7 +4,7 @@ import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useFBO } from '@react-three/drei';
+import { useDepthBuffer, useFBO } from '@react-three/drei';
 // @ts-ignore
 import detailShader from './edges.glsl';
 
@@ -85,7 +85,8 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 		state.gl.render(state.scene, state.camera);
 		state.gl.setRenderTarget(null);
 	});
-	// const depthBuffer = useDepthBuffer({ size: resolution.x > resolution.y ? resolution.x : resolution.y });
+	const depthBuffer = useDepthBuffer({ size: resolution.x > resolution.y ? resolution.x : resolution.y });
+	console.log(renderTexture.depthTexture, depthBuffer);
 	const { normalPass } = useContext(EffectComposerContext);
 	if (!normalPass)
 		return null;
