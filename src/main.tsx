@@ -4,10 +4,10 @@ import { NearestFilter, RepeatWrapping } from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
-import './styles.css';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './Edges';
+import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -32,9 +32,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 1, max: 32, step: 1, value: 12 },
-    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.0 },
-    details: { min: 0, max: 2.0, step: 0.2, value: 0.0 },
+		granularity: { min: 1, max: 32, step: 1, value: 8 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.4 },
+    details: { min: 0, max: 2.0, step: 0.1, value: 0.3 },
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
@@ -198,9 +198,9 @@ function Plane() {
       // tex.repeat.set(3, 3);
       tex.minFilter = NearestFilter;
       tex.magFilter = NearestFilter;
-      texture.generateMipmaps = false;
-      texture.wrapS = RepeatWrapping;
-      texture.wrapT = RepeatWrapping;
+      tex.generateMipmaps = false;
+      tex.wrapS = RepeatWrapping;
+      tex.wrapT = RepeatWrapping;
     });
 
   return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
