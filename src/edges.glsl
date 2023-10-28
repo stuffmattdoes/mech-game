@@ -41,9 +41,9 @@ float getNeighborDetail(int x, int y, float depth, vec3 normal) {
     float depthDiff = getDepth(x, y) - depth;
     vec3 neighborNormal = getNormal(x, y);
     
-    // Edge pixels should yield to faces who's normals are closer to the bias normal.
-    vec3 normalEdgeBias = vec3(1.0, 1.0, 1.0);
-    float normalDiff = dot(normal - neighborNormal, normalEdgeBias);
+    // Edge pixels should offset to faces who's normals are closer to the bias normal.
+    vec3 normalEdgeOffset = vec3(1.0, 1.0, 1.0);
+    float normalDiff = dot(normal - neighborNormal, normalEdgeOffset);
     float normalIndicator = clamp(smoothstep(-0.01, 0.02, normalDiff), 0.0, 1.0);
 
     // Only the shallower pixel should detect the normal edge.

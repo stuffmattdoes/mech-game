@@ -116,7 +116,6 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 		state.gl.setRenderTarget(null);
 	});
 	// const depthBuffer = useDepthBuffer({ size: resolution.x > resolution.y ? resolution.x : resolution.y });
-	console.log(renderTexture.depthTexture);
 	const { normalPass } = useContext(EffectComposerContext);
 	if (!normalPass)
 		return null;
