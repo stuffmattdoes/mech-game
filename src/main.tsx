@@ -55,7 +55,7 @@ function Environment() {
 
   useFrame(({ camera, viewport }) => {
     pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
-  })
+  });
 
 return <>
     <OrthographicCamera
@@ -98,6 +98,8 @@ return <>
 }
 
 function Scene() {
+  const texture = useTexture('textures/checker.png');
+
   return <scene>
     <Gem position={[0, 0.5, .25]}>
       <pointLight
@@ -118,6 +120,15 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
+    <mesh
+      castShadow
+      position={[0, 0.1, 0]}
+      scale={0.1}
+      receiveShadow
+    >
+      <sphereGeometry args={[]} />
+      <meshPhongMaterial args={[{ map: texture }]} />
+    </mesh>
     <Plane />
   </scene>
 }
