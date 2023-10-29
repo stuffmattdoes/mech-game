@@ -89,7 +89,7 @@ function Effects() {
     {/* <normalPass/> */}
     <DownSampleEffect {...controls}/>
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
-    <EdgesEffect {...controls}/>
+    {/* <EdgesEffect {...controls}/> */}
     {/* <effectPass/> */}
   </EffectComposer>
 }
