@@ -1,10 +1,9 @@
-import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2, Vector4 } from 'three';
+import { forwardRef, useMemo } from 'react';
+import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2 } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
-import { EffectComposerContext } from '@react-three/postprocessing';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useDepthBuffer, useFBO } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { useFBO } from '@react-three/drei';
 // @ts-ignore
 import edgeShader from './edges.glsl';
 
