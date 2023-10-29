@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3 } from 'three';
-import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
+import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3, MeshToonMaterial } from 'three';
+import { Camera, Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
@@ -44,7 +44,7 @@ function Effects() {
     <depthDownsamplingPass/>
     {/* <depthPass/> */}
     {/* <normalPass/> */}
-    {/* <DownSampleEffect {...controls}/> */}
+    <DownSampleEffect {...controls}/>
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
     {/* <EdgesEffect {...controls}/> */}
   </EffectComposer>
@@ -104,8 +104,6 @@ return <>
 }
 
 function Scene() {
-  const texture = useTexture('textures/checker.png');
-
   return <scene>
     <Gem position={[0, 0.5, .25]}>
       <pointLight
@@ -126,15 +124,10 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
-    <mesh
-      castShadow
+    <Ball
       position={[0, 0.1, 0]}
       scale={0.1}
-      receiveShadow
-    >
-      <sphereGeometry args={[]} />
-      <meshPhongMaterial args={[{ map: texture }]} />
-    </mesh>
+    />
     <Plane />
   </scene>
 }
@@ -142,7 +135,27 @@ function Scene() {
 interface IGameObject {
   position?: [x: number, y: number, z: number],
   rotation?: [x: number, y: number, z: number],
-  scale?: [x: number, y: number, z: number]
+  scale?: [x: number, y: number, z: number] | number
+}
+
+function Ball({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  scale = [1, 1, 1]
+}: IGameObject) {
+  const texture = useTexture('textures/checker.png');
+
+  return <mesh
+    castShadow
+    position={position}
+    rotation={rotation}
+    scale={scale}
+    receiveShadow
+  >
+    <sphereGeometry/>
+    <meshToonMaterial map={texture} />
+    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+  </mesh>
 }
 function Box({
   position = [0, 0, 0],
@@ -168,7 +181,8 @@ function Box({
     receiveShadow
   >
     <boxGeometry args={[...scale]} />
-    <meshPhongMaterial args={[{ map: texture }]} />
+    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+    <meshToonMaterial map={texture} />
   </mesh>
 }
 
@@ -222,7 +236,8 @@ function Plane() {
 
   return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
     <planeGeometry args={[2, 2]} />
-    <meshPhongMaterial args={[{ map: texture }]} />
+    <meshToonMaterial map={texture} />
+    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
   </mesh>
 }
 
