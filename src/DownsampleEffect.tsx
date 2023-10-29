@@ -70,10 +70,10 @@ export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, resolu
 		minFilter: NearestFilter,
 		stencilBuffer: false
 	});
-	renderTexture.setSize(resolution.x, resolution.y);
-
+	
 	useFrame((state) => {
 		// render standard texture
+		renderTexture.setSize(resolution.x, resolution.y);
 		state.gl.setRenderTarget(renderTexture);
 		state.gl.render(state.scene, state.camera);
 		state.gl.setRenderTarget(null);

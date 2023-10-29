@@ -90,17 +90,19 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 		minFilter: NearestFilter,
 		stencilBuffer: false,
 	});
-	normalTexture.setSize(resolution.x, resolution.y);
+	// normalTexture.setSize(resolution.x, resolution.y);
 	const normalMaterial = new MeshNormalMaterial();
 
 	useFrame((state) => {
 		// render standard texture
+		renderTexture.setSize(resolution.x, resolution.y);
 		state.gl.setRenderTarget(renderTexture);
 		state.gl.render(state.scene, state.camera);
 		state.gl.setRenderTarget(null);
 		
 		// render normal texture
 		const sceneMaterial = state.scene.overrideMaterial;
+		normalTexture.setSize(resolution.x, resolution.y);
 		state.gl.setRenderTarget(normalTexture)
 		state.scene.overrideMaterial = normalMaterial;
 		state.gl.render(state.scene, state.camera);
@@ -113,7 +115,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 	// console.log('downSamplingPass', downSamplingPass);
 	// normalPass.setSize(resolution.x, resolution.y);	
 
-	console.log(normalTexture.texture.source.data, renderTexture.depthTexture.source.data);
+	console.log('normal', normalTexture.texture.source.data, '\n', 'depth', renderTexture.depthTexture.source.data);
 
 	const effect = useMemo(() =>
 		new Edges(

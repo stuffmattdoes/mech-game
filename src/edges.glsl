@@ -66,8 +66,8 @@ float getDetail(float depth, vec3 normal) {
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
     #ifdef ENABLED
-        vec4 texel = texture2D(inputBuffer, vUv);
-        // vec4 texel = inputColor;
+        // vec4 texel = texture2D(inputBuffer, vUv);
+        vec4 texel = inputColor;
         // vec4 texel = texture2D(tDiffuse, vUv);
 
         vec3 normal = vec3(0.0);
