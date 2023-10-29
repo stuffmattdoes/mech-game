@@ -5,14 +5,14 @@ import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
-import { DepthDownsamplingPass, NormalPass } from 'postprocessing';
+import { DepthDownsamplingPass, DepthPass, NormalPass } from 'postprocessing';
 import { RenderPass } from 'three-stdlib';
 import { EdgesEffect } from './EdgesEffect';
 import { DownSampleEffect } from './DownsampleEffect';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
-extend({ DepthDownsamplingPass, NormalPass, RenderPass });
+extend({ DepthDownsamplingPass, DepthPass, NormalPass, RenderPass });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -42,8 +42,9 @@ function Effects() {
   return <EffectComposer depthBuffer multisampling={0}>
     {/* <renderPass/> */}
     <depthDownsamplingPass/>
+    {/* <depthPass/> */}
     {/* <normalPass/> */}
-    <DownSampleEffect {...controls}/>
+    {/* <DownSampleEffect {...controls}/> */}
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
     {/* <EdgesEffect {...controls}/> */}
   </EffectComposer>
