@@ -1,9 +1,8 @@
-import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2, Vector4, WebGLRenderTarget, WebGLRenderer } from 'three';
+import { forwardRef, useMemo } from 'react';
+import { NearestFilter, Uniform, Vector2 } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
-import { EffectComposerContext } from '@react-three/postprocessing';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useFBO } from '@react-three/drei';
 
 // This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
@@ -52,21 +51,11 @@ class DownSample extends Effect {
 		// redundant since changing useControls param rerenders <EffectComponent/>
 		this.setChanged();
 	}
-
-	// private set resolution(value: Vector2) {
-	// 	this.setSize(value.x, value.y);
-	// 	this.setChanged();
-	// }
-	
-	// update(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget<Texture>, deltaTime?: number | undefined): void {
-	// 	// renderer.setSize(this.resolution.x, this.resolution.y);
-	// 	console.log(this.resolution);
-	// }
 }
 
 type Props = {
 	enabled: boolean,
-	resolution: Vector4
+	resolution: Vector2
 }
 
 export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, resolution }, ref) => {

@@ -62,7 +62,7 @@ type EdgeProps = {
 	enabled: boolean,
 	// granularity: number,
 	outlines: number,
-	resolution: Vector4
+	resolution: Vector2
 }
 
 export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, outlines, resolution }, ref) => {
@@ -95,9 +95,9 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 
 	useFrame((state) => {
 		// render standard texture
-		// state.gl.setRenderTarget(renderTexture);
-		// state.gl.render(state.scene, state.camera);
-		// state.gl.setRenderTarget(null);
+		state.gl.setRenderTarget(renderTexture);
+		state.gl.render(state.scene, state.camera);
+		state.gl.setRenderTarget(null);
 		
 		// render normal texture
 		const sceneMaterial = state.scene.overrideMaterial;
@@ -112,6 +112,8 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 	// 	return null;
 	// console.log('downSamplingPass', downSamplingPass);
 	// normalPass.setSize(resolution.x, resolution.y);	
+
+	console.log(normalTexture.texture.source.data, renderTexture.depthTexture.source.data);
 
 	const effect = useMemo(() =>
 		new Edges(
