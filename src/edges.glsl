@@ -13,7 +13,7 @@ uniform sampler2D tNormalDepth;
 uniform float outlineStrength;
 
 float getDepth(int x, int y) {
-    return texture2D(depthBuffer, vUv + vec2(x, y) * (1.0 / resolution.xy)).a;
+    return texture2D(tNormalDepth, vUv + vec2(x, y) * (1.0 / resolution.xy)).a;
 }
 
 vec3 getNormal(int x, int y) {
