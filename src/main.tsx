@@ -1,24 +1,26 @@
 import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3 } from 'three';
-import { Camera, Canvas, extend, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
+import { DepthDownsamplingPass, NormalPass } from 'postprocessing';
 import { RenderPass } from 'three-stdlib';
-import { Edges } from './Edges';
+import { EdgesEffect } from './EdgesEffect';
+import { DownSampleEffect } from './DownsampleEffect';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
-
-extend({ RenderPass });
+extend({ DepthDownsamplingPass, NormalPass, RenderPass });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <div id='Canvas' style={{ width: '100vw', height: '100vh' }}>
       <Canvas shadows>
         <color attach='background' args={['#151729']} />
-        <Suspense fallback={<Loader />}>
+        {/* <Suspense fallback={<Loader />}> */}
+        <Suspense fallback={null}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
           <Scene />
@@ -38,8 +40,12 @@ function Effects() {
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
-    <renderPass/>
-    <Edges {...controls}/>
+    {/* <renderPass/> */}
+    <depthDownsamplingPass/>
+    {/* <normalPass/> */}
+    <DownSampleEffect {...controls}/>
+    {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
+    {/* <EdgesEffect {...controls}/> */}
   </EffectComposer>
 }
 
@@ -59,7 +65,7 @@ function Environment() {
 return <>
     <OrthographicCamera
       bottom={-1}
-      far={10}
+      far={5}
       left={-viewport.aspect}
       makeDefault
       near={0.1}
@@ -254,5 +260,4 @@ function pixelCameraDolly(
   camera.top = 1.0 - ( fractY * pixelHeight );
   camera.bottom = - 1.0 - ( fractY * pixelHeight );
   camera.updateProjectionMatrix();
-
 }

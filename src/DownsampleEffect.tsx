@@ -4,26 +4,32 @@ import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useDepthBuffer, useFBO } from '@react-three/drei';
-// @ts-ignore
-import detailShader from './edges.glsl';
+import { useFBO } from '@react-three/drei';
 
 // This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
 // About webgl shader variables https://threejs.org/docs/index.html#api/en/renderers/webgl/WebGLProgram
 
-class EdgeEffect extends Effect {
+class DownSample extends Effect {
 	constructor(
-		enabled: boolean = true,
-		detailStrength: number,
-		outlineStrength: number,
+		enabled: boolean,
 		resolution: Vector2,
 		renderTexture:  Texture,
 		depthTexture: Texture,
 		normalTexture: Texture
 	) {
 		super(
-			'EdgeShader',
-			detailShader,
+			'DownSampleEffect',
+			`
+				uniform sampler2D tDiffuse;
+
+				void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+					#ifdef ENABLED
+						outputColor = texture2D(tDiffuse, uv);
+					#else
+						outputColor = texture2D(inputBuffer, uv);
+					#endif
+				}
+			`,
 			{
 				attributes: EffectAttribute.DEPTH,
 				blendFunction: BlendFunction.NORMAL,
@@ -32,11 +38,9 @@ class EdgeEffect extends Effect {
 				]),
 				// @ts-ignore
 				uniforms: new Map([
-					['detailStrength', new Uniform(detailStrength)],
 					['tDepth', new Uniform(depthTexture)],
 					['tDiffuse', new Uniform(renderTexture)],
 					['tNormal', new Uniform(normalTexture)],
-					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(resolution)]
 				])
 			}
@@ -55,14 +59,12 @@ class EdgeEffect extends Effect {
 	}
 }
 
-type EdgeProps = {
-	details: number,
+type Props = {
 	enabled: boolean,
 	granularity: number,
-	outlines: number
 }
 
-export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
+export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, granularity }, ref) => {
 	/*
 		Future improvement:
 		1. Initial <shaderPass/> that downsamples texture, writes to output buffer
@@ -70,11 +72,12 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 	*/
 	const { size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
+	// console.log(resolution);
 	const renderConfig = {
 		generateMipmaps: false,
 		magFilter: NearestFilter,
 		minFilter: NearestFilter,
-		stencilBuffer: false,
+		stencilBuffer: false
 	};
 	const renderTexture = useFBO({
 		...renderConfig,
@@ -82,6 +85,7 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 		depthTexture: new DepthTexture(resolution.x, resolution.y)
 	});
 	renderTexture.setSize(resolution.x, resolution.y);
+	console.log(renderTexture);
 
 	const normalTexture = useFBO(renderConfig);
 	normalTexture.setSize(resolution.x, resolution.y);
@@ -106,10 +110,8 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 	normalPass.setSize(resolution.x, resolution.y);	
 
 	const effect = useMemo(() =>
-		new EdgeEffect(
+		new DownSample(
 			enabled,
-			details,
-			outlines,
 			resolution,
 			renderTexture.texture,
 			renderTexture.depthTexture,
@@ -118,8 +120,6 @@ export const Edges = forwardRef<EdgeEffect, EdgeProps>(({ details, enabled, gran
 		),
 		[
 			enabled,
-			details,
-			outlines,
 			resolution,
 			renderTexture.texture,
 			renderTexture.depthTexture,
