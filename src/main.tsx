@@ -64,7 +64,7 @@ return <>
       makeDefault
       near={0.1}
       // onUpdate={console.log}
-      position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
+      position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
       right={viewport.aspect}
       top={1}
     />
