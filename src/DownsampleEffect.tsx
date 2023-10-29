@@ -1,5 +1,5 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2, WebGLRenderTarget, WebGLRenderer } from 'three';
+import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2, Vector4, WebGLRenderTarget, WebGLRenderer } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
@@ -12,19 +12,17 @@ import { useFBO } from '@react-three/drei';
 class DownSample extends Effect {
 	constructor(
 		enabled: boolean,
-		resolution: Vector2,
-		// renderTexture:  Texture,
-		// depthTexture: Texture,
-		// normalTexture: Texture
+		renderTexture:  Texture,
 	) {
 		super(
 			'DownSampleEffect',
 			`
-				// uniform sampler2D tDiffuse;
+				// uniform sampler2D tDepthNormal;
+				uniform sampler2D tDiffuse;
 
 				void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
 					#ifdef ENABLED
-						outputColor = texture2D(inputBuffer, uv);
+						outputColor = texture2D(tDiffuse, uv);
 					#else
 						outputColor = texture2D(inputBuffer, uv);
 					#endif
@@ -36,18 +34,14 @@ class DownSample extends Effect {
 				defines: new Map([
 					['ENABLED', String(enabled)]
 				]),
-				// @ts-ignore
 				uniforms: new Map([
-					// ['tDepth', new Uniform(depthTexture)],
-					// ['tDiffuse', new Uniform(renderTexture)],
-					// ['tNormal', new Uniform(normalTexture)],
-					// ['resolution', new Uniform(resolution)]
+					['tDiffuse', new Uniform(renderTexture)]
 				])
 			}
 		);
 
 		this.enabled = enabled;
-		this.resolution = resolution;
+		// this.resolution = resolution;
 	}
 
 	private set enabled(value: boolean) {
@@ -59,10 +53,10 @@ class DownSample extends Effect {
 		this.setChanged();
 	}
 
-	private set resolution(value: Vector2) {
-		this.setSize(value.x, value.y);
-		this.setChanged();
-	}
+	// private set resolution(value: Vector2) {
+	// 	this.setSize(value.x, value.y);
+	// 	this.setChanged();
+	// }
 	
 	// update(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget<Texture>, deltaTime?: number | undefined): void {
 	// 	// renderer.setSize(this.resolution.x, this.resolution.y);
@@ -72,26 +66,44 @@ class DownSample extends Effect {
 
 type Props = {
 	enabled: boolean,
-	granularity: number,
+	resolution: Vector4
 }
 
-export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, granularity }, ref) => {
+export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, resolution }, ref) => {
 	/*
 		Future improvement:
 		1. Initial <shaderPass/> that downsamples texture, writes to output buffer
 		2. Follow up <effectPass/> which receives downsampled textures as inputBuffer
 	*/
-	const { gl, size } = useThree();
-	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
+	const { size } = useThree();
+	const renderConfig = {
+		generateMipmaps: false,
+		magFilter: NearestFilter,
+		minFilter: NearestFilter,
+		stencilBuffer: false,
+	};
+	const renderTexture = useFBO({
+		...renderConfig,
+		depthBuffer: true,
+		depthTexture: new DepthTexture(resolution.x, resolution.y)
+	});
+	renderTexture.setSize(resolution.x, resolution.y);
+
+	useFrame((state) => {
+		// render standard texture
+		state.gl.setRenderTarget(renderTexture);
+		state.gl.render(state.scene, state.camera);
+		state.gl.setRenderTarget(null);
+	});
 	
 	const effect = useMemo(() =>
 		new DownSample(
 			enabled,
-			resolution
+			renderTexture.texture
 		),
 		[
 			enabled,
-			resolution
+			renderTexture
 		]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });

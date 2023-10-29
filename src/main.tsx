@@ -1,9 +1,9 @@
-import React, { PropsWithChildren, Suspense } from 'react';
+import React, { PropsWithChildren, Suspense, useContext } from 'react';
 import ReactDOM from 'react-dom/client';
 import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3, MeshToonMaterial, Vector2, MeshNormalMaterial, DepthTexture } from 'three';
 import { Camera, Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useFBO, useProgress, useTexture } from '@react-three/drei';
-import { EffectComposer } from '@react-three/postprocessing';
+import { EffectComposer, EffectComposerContext } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { DepthDownsamplingPass, DepthPass, EffectPass, NormalPass } from 'postprocessing';
 import { RenderPass } from 'three-stdlib';
@@ -38,58 +38,21 @@ function Effects() {
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.4 },
     details: { min: 0, max: 2.0, step: 0.1, value: 0.3 },
 	});
-
-  // const { gl } = useThree();
-  const { gl, size, camera } = useThree();
-	const resolution = new Vector2(size.width, size.height).divideScalar(controls.granularity).round();
-  	const renderTexture = useFBO({
-      generateMipmaps: false,
-      magFilter: NearestFilter,
-      minFilter: NearestFilter,
-      stencilBuffer: false,
-		  depthBuffer: true,
-		  depthTexture: new DepthTexture(resolution.x, resolution.y)
-	});
-	// renderTexture.setSize(resolution.x, resolution.y);
-  // gl.setPixelRatio(controls.granularity);
-  // gl.setViewport(0, 0, resolution.x, resolution.y);
-  // gl.setSize(resolution.x, resolution.y);
-
-  const normalTexture = useFBO({
-		generateMipmaps: false,
-		magFilter: NearestFilter,
-		minFilter: NearestFilter,
-		stencilBuffer: false
-	});
-	normalTexture.setSize(resolution.x, resolution.y);
-	// const normalMaterial = new MeshNormalMaterial();
-
-	useFrame(({ camera, gl, scene }) => {
-    // gl.getContext().colorMask(false, false, false, false);
-		// gl.setRenderTarget(renderTexture);
-		// gl.render(scene, camera);
-		// gl.setRenderTarget(null);
-		
-		// render normal texture
-		// const sceneMaterial = state.scene.overrideMaterial;
-		// state.gl.setRenderTarget(normalTexture)
-		// state.scene.overrideMaterial = normalMaterial;
-		// state.gl.render(state.scene, state.camera);
-		// state.scene.overrideMaterial = sceneMaterial
-	});
+  const { size } = useThree();
+  const resolution = new Vector2(size.width, size.height).divideScalar(controls.granularity).round();
 
   return <EffectComposer
     depthBuffer
     multisampling={0}
-    resolutionScale={1.0 / controls.granularity}
+    resolutionScale={1.0}
   >
     {/* <renderPass/> */}
     {/* <depthDownsamplingPass/> */}
     {/* <depthPass/> */}
     {/* <normalPass/> */}
-    <DownSampleEffect {...controls}/>
+    <DownSampleEffect {...controls} resolution={resolution}/>
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
-    {/* <EdgesEffect {...controls}/> */}
+    <EdgesEffect {...controls} resolution={resolution}/>
     {/* <effectPass/> */}
   </EffectComposer>
 }

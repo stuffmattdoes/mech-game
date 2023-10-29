@@ -1,5 +1,5 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2 } from 'three';
+import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2, Vector4 } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
@@ -60,11 +60,12 @@ class Edges extends Effect {
 type EdgeProps = {
 	details: number,
 	enabled: boolean,
-	granularity: number,
-	outlines: number
+	// granularity: number,
+	outlines: number,
+	resolution: Vector4
 }
 
-export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, granularity, outlines }, ref) => {
+export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, outlines, resolution }, ref) => {
 	/*
 		Future improvement:
 		1. Initial <shaderPass/> that downsamples texture, writes to output buffer
@@ -86,32 +87,38 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 	// });
 	// renderTexture.setSize(resolution.x, resolution.y);
 
-	const normalTexture = useFBO({
-		generateMipmaps: false,
-		magFilter: NearestFilter,
-		minFilter: NearestFilter,
-		stencilBuffer: false,
-	});
-	// normalTexture.setSize(resolution.x, resolution.y);
-	const normalMaterial = new MeshNormalMaterial();
-
-	useFrame((state) => {
-		// render standard texture
-		// state.gl.setRenderTarget(renderTexture);
-		// state.gl.render(state.scene, state.camera);
-		// state.gl.setRenderTarget(null);
-		
-		// render normal texture
-		const sceneMaterial = state.scene.overrideMaterial;
-		state.gl.setRenderTarget(normalTexture)
-		state.scene.overrideMaterial = normalMaterial;
-		state.gl.render(state.scene, state.camera);
-		state.scene.overrideMaterial = sceneMaterial
-	});
 	const { downSamplingPass, normalPass } = useContext(EffectComposerContext);
 
-	if (!normalPass || !downSamplingPass)
-		return null;
+	if (!downSamplingPass) return null;
+
+	downSamplingPass.setSize(resolution.x, resolution.y);
+
+	// const normalTexture = useFBO({
+	// 	generateMipmaps: false,
+	// 	magFilter: NearestFilter,
+	// 	minFilter: NearestFilter,
+	// 	stencilBuffer: false,
+	// });
+	// // normalTexture.setSize(resolution.x, resolution.y);
+	// const normalMaterial = new MeshNormalMaterial();
+
+	// useFrame((state) => {
+	// 	// render standard texture
+	// 	// state.gl.setRenderTarget(renderTexture);
+	// 	// state.gl.render(state.scene, state.camera);
+	// 	// state.gl.setRenderTarget(null);
+		
+	// 	// render normal texture
+	// 	const sceneMaterial = state.scene.overrideMaterial;
+	// 	state.gl.setRenderTarget(normalTexture)
+	// 	state.scene.overrideMaterial = normalMaterial;
+	// 	state.gl.render(state.scene, state.camera);
+	// 	state.scene.overrideMaterial = sceneMaterial
+	// });
+	// const { downSamplingPass, normalPass } = useContext(EffectComposerContext);
+
+	// if (!normalPass || !downSamplingPass)
+	// 	return null;
 	// console.log('downSamplingPass', downSamplingPass);
 	// normalPass.setSize(resolution.x, resolution.y);	
 
