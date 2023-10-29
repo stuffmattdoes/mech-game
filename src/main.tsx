@@ -1,9 +1,9 @@
 import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3 } from 'three';
-import { Camera, Canvas, extend, useFrame, useThree } from '@react-three/fiber';
+import { NearestFilter, OrthographicCamera as IOrthographicCamera, RepeatWrapping } from 'three';
+import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './Edges';

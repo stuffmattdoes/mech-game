@@ -4,7 +4,7 @@ import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useDepthBuffer, useFBO } from '@react-three/drei';
+import { useFBO } from '@react-three/drei';
 // @ts-ignore
 import detailShader from './edges.glsl';
 
