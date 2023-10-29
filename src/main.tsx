@@ -205,7 +205,7 @@ const Gem: React.FC<PropsWithChildren<IGameObject>> = ({
     rotation={rotation}
     scale={scale}
   >
-    <dodecahedronGeometry args={[.15]} />
+    <icosahedronGeometry args={[.15]} />
     <meshPhongMaterial args={[{
       color: 0x2379cf,
       emissive: 0x143542,
