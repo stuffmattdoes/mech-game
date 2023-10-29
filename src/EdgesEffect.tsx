@@ -17,7 +17,8 @@ class Edges extends Effect {
 		detailStrength: number,
 		outlineStrength: number,
 		resolution: Vector2,
-		renderTexture: Texture,
+		// renderTexture: Texture,
+		// depthNormal: Texture
 		depthTexture: Texture,
 		normalTexture: Texture,
 	) {
@@ -33,9 +34,10 @@ class Edges extends Effect {
 				// @ts-ignore
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
-					['tDiffuse', new Uniform(renderTexture)],
+					// ['tDiffuse', new Uniform(renderTexture)],
 					['tDepth', new Uniform(depthTexture)],
 					['tNormal', new Uniform(normalTexture)],
+					// ['tDepthNormal', new Uniform(depthNormal)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					['resolution', new Uniform(resolution)]
 				])
@@ -111,7 +113,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 			details,
 			outlines,
 			resolution,
-			renderTexture.texture,
+			// renderTexture.texture,
 			renderTexture.depthTexture,
 			normalTexture.texture,
 		),
@@ -120,7 +122,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 			details,
 			outlines,
 			resolution,
-			renderTexture.texture,
+			// renderTexture.texture,
 			renderTexture.depthTexture,
 			normalTexture.texture
 		]);

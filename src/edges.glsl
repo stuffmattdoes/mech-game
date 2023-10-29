@@ -68,7 +68,6 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
     #ifdef ENABLED
         // vec4 texel = texture2D(inputBuffer, vUv);
         vec4 texel = inputColor;
-        // vec4 texel = texture2D(tDiffuse, vUv);
 
         vec3 normal = vec3(0.0);
         float _depth = 0.0;
@@ -90,12 +89,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-        // outputColor = vec4(inputColor.rgb * strength, inputColor.a);
-        // depthBuffer = outputColor.a;
         outputColor = vec4(texel.rgb * strength, inputColor.a);
-
-        // vec4 sample = texture2D(tDownSample, uv);
-        // outputColor = vec4(0.0);
     #else
         outputColor = inputColor;
     #endif
