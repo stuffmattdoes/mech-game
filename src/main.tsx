@@ -87,7 +87,6 @@ return <>
       intensity={0.8}
       color={0xfffc9c}
       position={[60, 50, 100]}
-      // shadow-blurSamples={0}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
       // shadow-radius={0}
@@ -162,7 +161,7 @@ function Box({
     (tex) => {
       if (Array.isArray(tex))
         return tex;
-      texture.repeat.set(1.5, 1.5);
+      tex.repeat.set(1.5, 1.5);
       tex.minFilter = NearestFilter;
       tex.magFilter = NearestFilter;
       tex.generateMipmaps = false;
