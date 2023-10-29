@@ -75,17 +75,11 @@ export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, resolu
 		1. Initial <shaderPass/> that downsamples texture, writes to output buffer
 		2. Follow up <effectPass/> which receives downsampled textures as inputBuffer
 	*/
-	const { size } = useThree();
-	const renderConfig = {
+	const renderTexture = useFBO({
 		generateMipmaps: false,
 		magFilter: NearestFilter,
 		minFilter: NearestFilter,
-		stencilBuffer: false,
-	};
-	const renderTexture = useFBO({
-		...renderConfig,
-		depthBuffer: true,
-		depthTexture: new DepthTexture(resolution.x, resolution.y)
+		stencilBuffer: false
 	});
 	renderTexture.setSize(resolution.x, resolution.y);
 

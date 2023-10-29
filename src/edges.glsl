@@ -6,18 +6,18 @@
 
 // custom
 uniform float detailStrength;
-// uniform sampler2D tDepth;
+uniform sampler2D tDepth;
 // uniform sampler2D tDiffuse;
-// uniform sampler2D tNormal;
-uniform sampler2D tNormalDepth;
+uniform sampler2D tNormal;
+// uniform sampler2D tNormalDepth;
 uniform float outlineStrength;
 
 float getDepth(int x, int y) {
-    return texture2D(tNormalDepth, vUv + vec2(x, y) * (1.0 / resolution.xy)).a;
+    return texture2D(tDepth, vUv + vec2(x, y) * (1.0 / resolution.xy)).a;
 }
 
 vec3 getNormal(int x, int y) {
-    return texture2D(tNormalDepth, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0;
+    return texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0;
 }
 
 float getOutline(float depth) {
