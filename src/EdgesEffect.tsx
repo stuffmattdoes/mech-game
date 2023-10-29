@@ -16,11 +16,9 @@ class Edges extends Effect {
 		enabled: boolean = true,
 		detailStrength: number,
 		outlineStrength: number,
-		// resolution: Vector2,
-		// renderTexture:  Texture,
+		resolution: Vector2,
 		depthTexture: Texture,
 		normalTexture: Texture,
-		// downSampleTexture: Texture
 	) {
 		super(
 			'EdgesEffect',
@@ -35,11 +33,9 @@ class Edges extends Effect {
 				uniforms: new Map([
 					['detailStrength', new Uniform(detailStrength)],
 					['tDepth', new Uniform(depthTexture)],
-					// ['tDiffuse', new Uniform(renderTexture)],
-					// ['tNormalDepth', new Uniform(downSampleTexture)],
 					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
-					// ['resolution', new Uniform(resolution)]
+					['resolution', new Uniform(resolution)]
 				])
 			}
 		);
@@ -82,7 +78,6 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 		depthBuffer: true,
 		depthTexture: new DepthTexture(resolution.x, resolution.y)
 	});
-	renderTexture.setSize(resolution.x, resolution.y);
 
 	const normalTexture = useFBO({
 		generateMipmaps: false,
@@ -90,7 +85,6 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 		minFilter: NearestFilter,
 		stencilBuffer: false,
 	});
-	// normalTexture.setSize(resolution.x, resolution.y);
 	const normalMaterial = new MeshNormalMaterial();
 
 	useFrame((state) => {
@@ -108,36 +102,22 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, out
 		state.gl.render(state.scene, state.camera);
 		state.scene.overrideMaterial = sceneMaterial
 	});
-	// const { downSamplingPass, normalPass } = useContext(EffectComposerContext);
-
-	// if (!normalPass || !downSamplingPass)
-	// 	return null;
-	// console.log('downSamplingPass', downSamplingPass);
-	// normalPass.setSize(resolution.x, resolution.y);	
-
-	console.log('normal', normalTexture.texture.source.data, '\n', 'depth', renderTexture.depthTexture.source.data);
 
 	const effect = useMemo(() =>
 		new Edges(
 			enabled,
 			details,
 			outlines,
-			// resolution,
-			// renderTexture.texture,
+			resolution,
 			renderTexture.depthTexture,
-			// downSamplingPass.texture,
-			// normalPass.texture
 			normalTexture.texture,
 		),
 		[
 			enabled,
 			details,
 			outlines,
-			// resolution,
-			// renderTexture.texture,
+			resolution,
 			renderTexture.depthTexture,
-			// downSamplingPass.texture,
-			// normalPass.texture
 			normalTexture.texture
 		]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
