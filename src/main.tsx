@@ -52,9 +52,9 @@ function Environment() {
   const { viewport } = useThree();
   // const thr =  useThree();
 
-  useFrame(({ camera, viewport }) => {
-    pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
-  });
+  // useFrame(({ camera, viewport }) => {
+  //   pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
+  // });
 
 return <>
     <OrthographicCamera
@@ -109,6 +109,11 @@ function Scene() {
         // castShadow
       />
     </Gem>
+    <Ball
+      position={[0, 0.2 / 2, 0]}
+      rotation={[0, Math.PI / 4, 0]}
+      scale={[0.1, 0.1, 0.1]}
+    />
     <Box
       position={[.4, 0.4 / 2, 0]}
       rotation={[0, Math.PI / 4, 0]}
@@ -119,15 +124,6 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
-    <mesh
-      castShadow
-      position={[0, 0.1, 0]}
-      scale={0.1}
-      receiveShadow
-    >
-      <sphereGeometry args={[]} />
-      <meshPhongMaterial args={[{ map: texture }]} />
-    </mesh>
     <Plane />
   </scene>
 }
@@ -137,6 +133,26 @@ interface IGameObject {
   rotation?: [x: number, y: number, z: number],
   scale?: [x: number, y: number, z: number]
 }
+function Ball({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  scale = [1, 1, 1]
+}: IGameObject) {
+  const texture = useTexture('textures/checker.png');
+
+  return <mesh
+    castShadow
+    position={position}
+    rotation={rotation}
+    scale={scale}
+    receiveShadow
+  >
+    <sphereGeometry/>
+    <meshToonMaterial map={texture} />
+    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+  </mesh>
+}
+
 function Box({
   position = [0, 0, 0],
   rotation = [0, 0, 0],
@@ -161,7 +177,8 @@ function Box({
     receiveShadow
   >
     <boxGeometry args={[...scale]} />
-    <meshPhongMaterial args={[{ map: texture }]} />
+    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+    <meshToonMaterial map={texture} />
   </mesh>
 }
 
@@ -215,7 +232,8 @@ function Plane() {
 
   return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
     <planeGeometry args={[2, 2]} />
-    <meshPhongMaterial args={[{ map: texture }]} />
+    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+    <meshToonMaterial map={texture} />
   </mesh>
 }
 
@@ -254,5 +272,4 @@ function pixelCameraDolly(
   camera.top = 1.0 - ( fractY * pixelHeight );
   camera.bottom = - 1.0 - ( fractY * pixelHeight );
   camera.updateProjectionMatrix();
-
 }
