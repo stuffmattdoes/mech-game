@@ -59,7 +59,7 @@ function Environment() {
 return <>
     <OrthographicCamera
       bottom={-1}
-      far={10}
+      far={5}
       left={-viewport.aspect}
       makeDefault
       near={0.1}
