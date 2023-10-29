@@ -40,7 +40,6 @@ function Effects() {
 	});
 
   // const { gl } = useThree();
-  // gl.setSize(144, 144);
   const { gl, size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(controls.granularity).round();
   	const renderTexture = useFBO({
@@ -79,7 +78,11 @@ function Effects() {
 		// state.scene.overrideMaterial = sceneMaterial
 	});
 
-  return <EffectComposer depthBuffer multisampling={0}>
+  return <EffectComposer
+    depthBuffer
+    multisampling={0}
+    resolutionScale={1.0 / controls.granularity}
+  >
     {/* <renderPass/> */}
     {/* <depthDownsamplingPass/> */}
     {/* <depthPass/> */}

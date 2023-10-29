@@ -19,7 +19,7 @@ class Edges extends Effect {
 		// resolution: Vector2,
 		// renderTexture:  Texture,
 		// depthTexture: Texture,
-		normalTexture: Texture,
+		// normalTexture: Texture,
 		downSampleTexture: Texture
 	) {
 		super(
@@ -36,8 +36,8 @@ class Edges extends Effect {
 					['detailStrength', new Uniform(detailStrength)],
 					// ['tDepth', new Uniform(depthTexture)],
 					// ['tDiffuse', new Uniform(renderTexture)],
-					['tDownSample', new Uniform(downSampleTexture)],
-					['tNormal', new Uniform(normalTexture)],
+					['tNormalDepth', new Uniform(downSampleTexture)],
+					// ['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
 					// ['resolution', new Uniform(resolution)]
 				])
@@ -70,7 +70,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 		1. Initial <shaderPass/> that downsamples texture, writes to output buffer
 		2. Follow up <effectPass/> which receives downsampled textures as inputBuffer
 	*/
-	const { size } = useThree();
+	// const { size } = useThree();
 	// const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
 	// console.log(resolution);
 	// const renderConfig = {
@@ -112,7 +112,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 
 	if (!normalPass || !downSamplingPass)
 		return null;
-	console.log('downSamplingPass', downSamplingPass);
+	// console.log('downSamplingPass', downSamplingPass);
 	// normalPass.setSize(resolution.x, resolution.y);	
 
 	const effect = useMemo(() =>
@@ -123,9 +123,10 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 			// resolution,
 			// renderTexture.texture,
 			// renderTexture.depthTexture,
+			downSamplingPass.texture,
 			// normalPass.texture
-			normalTexture.texture,
-			downSamplingPass?.texture
+			// normalTexture.texture,
+			// downSamplingPass?.texture
 		),
 		[
 			enabled,
@@ -134,8 +135,9 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 			// resolution,
 			// renderTexture.texture,
 			// renderTexture.depthTexture,
+			downSamplingPass.texture,
 			// normalPass.texture
-			normalTexture.texture
+			// normalTexture.texture
 		]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });
