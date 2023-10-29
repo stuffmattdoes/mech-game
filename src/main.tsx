@@ -153,8 +153,8 @@ function Ball({
     receiveShadow
   >
     <sphereGeometry/>
-    <meshToonMaterial map={texture} />
-    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+    {/* <meshToonMaterial map={texture} /> */}
+    <meshPhongMaterial map={texture} />
   </mesh>
 }
 function Box({
@@ -181,8 +181,8 @@ function Box({
     receiveShadow
   >
     <boxGeometry args={[...scale]} />
-    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
-    <meshToonMaterial map={texture} />
+    {/* <meshToonMaterial map={texture} /> */}
+    <meshPhongMaterial map={texture} />
   </mesh>
 }
 
@@ -236,8 +236,8 @@ function Plane() {
 
   return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
     <planeGeometry args={[2, 2]} />
-    <meshToonMaterial map={texture} />
-    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+    {/* <meshToonMaterial map={texture} /> */}
+    <meshPhongMaterial map={texture} />
   </mesh>
 }
 
