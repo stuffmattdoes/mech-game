@@ -1,5 +1,5 @@
 import { forwardRef, useContext, useMemo } from 'react';
-import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2 } from 'three';
+import { DepthTexture, MeshNormalMaterial, NearestFilter, Uniform, Vector2, WebGLRenderTarget, WebGLRenderer } from 'three';
 import { type Texture } from 'three';
 import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { EffectComposerContext } from '@react-three/postprocessing';
@@ -13,18 +13,18 @@ class DownSample extends Effect {
 	constructor(
 		enabled: boolean,
 		resolution: Vector2,
-		renderTexture:  Texture,
-		depthTexture: Texture,
-		normalTexture: Texture
+		// renderTexture:  Texture,
+		// depthTexture: Texture,
+		// normalTexture: Texture
 	) {
 		super(
 			'DownSampleEffect',
 			`
-				uniform sampler2D tDiffuse;
+				// uniform sampler2D tDiffuse;
 
 				void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
 					#ifdef ENABLED
-						outputColor = texture2D(tDiffuse, uv);
+						outputColor = texture2D(inputBuffer, uv);
 					#else
 						outputColor = texture2D(inputBuffer, uv);
 					#endif
@@ -39,7 +39,7 @@ class DownSample extends Effect {
 				// @ts-ignore
 				uniforms: new Map([
 					// ['tDepth', new Uniform(depthTexture)],
-					['tDiffuse', new Uniform(renderTexture)],
+					// ['tDiffuse', new Uniform(renderTexture)],
 					// ['tNormal', new Uniform(normalTexture)],
 					// ['resolution', new Uniform(resolution)]
 				])
@@ -47,6 +47,7 @@ class DownSample extends Effect {
 		);
 
 		this.enabled = enabled;
+		this.resolution = resolution;
 	}
 
 	private set enabled(value: boolean) {
@@ -57,6 +58,16 @@ class DownSample extends Effect {
 		// redundant since changing useControls param rerenders <EffectComponent/>
 		this.setChanged();
 	}
+
+	private set resolution(value: Vector2) {
+		this.setSize(value.x, value.y);
+		this.setChanged();
+	}
+	
+	// update(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget<Texture>, deltaTime?: number | undefined): void {
+	// 	// renderer.setSize(this.resolution.x, this.resolution.y);
+	// 	console.log(this.resolution);
+	// }
 }
 
 type Props = {
@@ -72,36 +83,36 @@ export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, granul
 	*/
 	const { size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
-	const renderConfig = {
-		generateMipmaps: false,
-		magFilter: NearestFilter,
-		minFilter: NearestFilter,
-		stencilBuffer: false
-	};
-	const renderTexture = useFBO({
-		...renderConfig,
-		depthBuffer: true,
-		depthTexture: new DepthTexture(resolution.x, resolution.y)
-	});
-	renderTexture.setSize(resolution.x, resolution.y);
+	// const renderConfig = {
+	// 	generateMipmaps: false,
+	// 	magFilter: NearestFilter,
+	// 	minFilter: NearestFilter,
+	// 	stencilBuffer: false
+	// };
+	// const renderTexture = useFBO({
+	// 	...renderConfig,
+	// 	depthBuffer: true,
+	// 	depthTexture: new DepthTexture(resolution.x, resolution.y)
+	// });
+	// renderTexture.setSize(resolution.x, resolution.y);
 
-	const normalTexture = useFBO(renderConfig);
-	normalTexture.setSize(resolution.x, resolution.y);
-	const normalMaterial = new MeshNormalMaterial();
+	// const normalTexture = useFBO(renderConfig);
+	// normalTexture.setSize(resolution.x, resolution.y);
+	// const normalMaterial = new MeshNormalMaterial();
 
-	useFrame((state) => {
-		// render standard texture
-		state.gl.setRenderTarget(renderTexture);
-		state.gl.render(state.scene, state.camera);
-		state.gl.setRenderTarget(null);
+	// useFrame((state) => {
+	// 	// render standard texture
+	// 	state.gl.setRenderTarget(renderTexture);
+	// 	state.gl.render(state.scene, state.camera);
+	// 	state.gl.setRenderTarget(null);
 		
-		// render normal texture
-		const sceneMaterial = state.scene.overrideMaterial;
-		state.gl.setRenderTarget(normalTexture)
-		state.scene.overrideMaterial = normalMaterial;
-		state.gl.render(state.scene, state.camera);
-		state.scene.overrideMaterial = sceneMaterial
-	});
+	// 	// render normal texture
+	// 	const sceneMaterial = state.scene.overrideMaterial;
+	// 	state.gl.setRenderTarget(normalTexture)
+	// 	state.scene.overrideMaterial = normalMaterial;
+	// 	state.gl.render(state.scene, state.camera);
+	// 	state.scene.overrideMaterial = sceneMaterial
+	// });
 	const { normalPass } = useContext(EffectComposerContext);
 	if (!normalPass)
 		return null;
@@ -111,18 +122,16 @@ export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, granul
 		new DownSample(
 			enabled,
 			resolution,
-			renderTexture.texture,
-			renderTexture.depthTexture,
-			// normalPass.texture
-			normalTexture.texture
+			// renderTexture.texture,
+			// renderTexture.depthTexture,
+			// normalTexture.texture
 		),
 		[
 			enabled,
 			resolution,
-			renderTexture.texture,
-			renderTexture.depthTexture,
-			// normalPass.texture
-			normalTexture.texture
+			// renderTexture.texture,
+			// renderTexture.depthTexture,
+			// normalTexture.texture
 		]);
 	return <primitive ref={ref} object={effect} dispose={null}/>;
 });

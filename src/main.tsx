@@ -40,7 +40,7 @@ function Effects() {
 	});
 
   // const { gl } = useThree();
-  const { gl, size } = useThree();
+  const { gl, size, camera } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(controls.granularity).round();
   	const renderTexture = useFBO({
       generateMipmaps: false,
@@ -87,7 +87,7 @@ function Effects() {
     {/* <depthDownsamplingPass/> */}
     {/* <depthPass/> */}
     {/* <normalPass/> */}
-    {/* <DownSampleEffect {...controls}/> */}
+    <DownSampleEffect {...controls}/>
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
     <EdgesEffect {...controls}/>
     {/* <effectPass/> */}
@@ -109,6 +109,7 @@ function Environment() {
 
 return <>
     <OrthographicCamera
+      resolution={144}
       bottom={-1}
       far={5}
       left={-viewport.aspect}
