@@ -38,10 +38,10 @@ class DownSample extends Effect {
 				]),
 				// @ts-ignore
 				uniforms: new Map([
-					['tDepth', new Uniform(depthTexture)],
+					// ['tDepth', new Uniform(depthTexture)],
 					['tDiffuse', new Uniform(renderTexture)],
-					['tNormal', new Uniform(normalTexture)],
-					['resolution', new Uniform(resolution)]
+					// ['tNormal', new Uniform(normalTexture)],
+					// ['resolution', new Uniform(resolution)]
 				])
 			}
 		);

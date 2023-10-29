@@ -2,7 +2,7 @@
 // will throw error if you define here without also passing in custom uniform through app code
 // uniform sampler2D inputBuffer;
 // uniform sampler2D depthBuffer;
-uniform vec4 resolution;
+// uniform vec4 resolution;
 
 // custom
 uniform float detailStrength;
@@ -91,8 +91,8 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             : (1.0 + detailStrength * detail);
 
         outputColor = vec4(inputColor.rgb * strength, inputColor.a);
-        depthBuffer = outputColor.a;
-        // outputColor = vec4(texel.rgb * strength, inputColor.a);
+        // depthBuffer = outputColor.a;
+        outputColor = vec4(texel.rgb * strength, inputColor.a);
 
         // vec4 sample = texture2D(tDownSample, uv);
         // outputColor = vec4(0.0);

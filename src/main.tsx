@@ -80,14 +80,14 @@ function Effects() {
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
-    <renderPass/>
-    <effectPass/>
+    {/* <renderPass/> */}
     {/* <depthDownsamplingPass/> */}
     {/* <depthPass/> */}
     {/* <normalPass/> */}
     {/* <DownSampleEffect {...controls}/> */}
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
     <EdgesEffect {...controls}/>
+    {/* <effectPass/> */}
   </EffectComposer>
 }
 
@@ -112,7 +112,7 @@ return <>
       makeDefault
       near={.1}
       // onUpdate={console.log}
-      position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
+      position={[ .6, 2 * Math.tan(Math.PI / 6), 2]}
       right={viewport.aspect}
       top={1}
     />

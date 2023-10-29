@@ -16,7 +16,7 @@ class Edges extends Effect {
 		enabled: boolean = true,
 		detailStrength: number,
 		outlineStrength: number,
-		resolution: Vector2,
+		// resolution: Vector2,
 		// renderTexture:  Texture,
 		// depthTexture: Texture,
 		normalTexture: Texture,
@@ -39,7 +39,7 @@ class Edges extends Effect {
 					['tDownSample', new Uniform(downSampleTexture)],
 					['tNormal', new Uniform(normalTexture)],
 					['outlineStrength', new Uniform(outlineStrength)],
-					['resolution', new Uniform(resolution)]
+					// ['resolution', new Uniform(resolution)]
 				])
 			}
 		);
@@ -71,7 +71,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 		2. Follow up <effectPass/> which receives downsampled textures as inputBuffer
 	*/
 	const { size } = useThree();
-	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
+	// const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
 	// console.log(resolution);
 	// const renderConfig = {
 	// 	generateMipmaps: false,
@@ -92,7 +92,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 		minFilter: NearestFilter,
 		stencilBuffer: false,
 	});
-	normalTexture.setSize(resolution.x, resolution.y);
+	// normalTexture.setSize(resolution.x, resolution.y);
 	const normalMaterial = new MeshNormalMaterial();
 
 	useFrame((state) => {
@@ -120,7 +120,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 			enabled,
 			details,
 			outlines,
-			resolution,
+			// resolution,
 			// renderTexture.texture,
 			// renderTexture.depthTexture,
 			// normalPass.texture
@@ -131,7 +131,7 @@ export const EdgesEffect = forwardRef<Edges, EdgeProps>(({ details, enabled, gra
 			enabled,
 			details,
 			outlines,
-			resolution,
+			// resolution,
 			// renderTexture.texture,
 			// renderTexture.depthTexture,
 			// normalPass.texture
