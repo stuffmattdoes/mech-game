@@ -9,11 +9,11 @@ uniform float detailStrength;
 // uniform sampler2D tDepth;
 // uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
-uniform sampler2D tDownSample;
+// uniform sampler2D tDownSample;
 uniform float outlineStrength;
 
 float getDepth(int x, int y) {
-    return texture2D(tDownSample, vUv + vec2(x, y) * (1.0 / resolution.xy)).r;
+    return texture2D(depthBuffer, vUv + vec2(x, y) * (1.0 / resolution.xy)).r;
 }
 
 vec3 getNormal(int x, int y) {
@@ -90,11 +90,12 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-        // outputColor = vec4(inputColor.rgb * strength, inputColor.a);
+        outputColor = vec4(inputColor.rgb * strength, inputColor.a);
+        depthBuffer = outputColor.a;
         // outputColor = vec4(texel.rgb * strength, inputColor.a);
 
-        vec4 sample = texture2D(tDownSample, uv);
-        outputColor = vec4(0.0);
+        // vec4 sample = texture2D(tDownSample, uv);
+        // outputColor = vec4(0.0);
     #else
         outputColor = inputColor;
     #endif

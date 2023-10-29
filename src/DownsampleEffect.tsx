@@ -72,7 +72,6 @@ export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, granul
 	*/
 	const { size } = useThree();
 	const resolution = new Vector2(size.width, size.height).divideScalar(granularity).round();
-	// console.log(resolution);
 	const renderConfig = {
 		generateMipmaps: false,
 		magFilter: NearestFilter,
@@ -85,7 +84,6 @@ export const DownSampleEffect = forwardRef<DownSample, Props>(({ enabled, granul
 		depthTexture: new DepthTexture(resolution.x, resolution.y)
 	});
 	renderTexture.setSize(resolution.x, resolution.y);
-	console.log(renderTexture);
 
 	const normalTexture = useFBO(renderConfig);
 	normalTexture.setSize(resolution.x, resolution.y);

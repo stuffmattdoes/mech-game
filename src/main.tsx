@@ -1,18 +1,18 @@
 import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3, MeshToonMaterial } from 'three';
+import { NearestFilter, OrthographicCamera as IOrthographicCamera, Quaternion, RepeatWrapping, Vector3, MeshToonMaterial, Vector2, MeshNormalMaterial, DepthTexture } from 'three';
 import { Camera, Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, OrthographicCamera, StatsGl, useFBO, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
-import { DepthDownsamplingPass, DepthPass, NormalPass } from 'postprocessing';
+import { DepthDownsamplingPass, DepthPass, EffectPass, NormalPass } from 'postprocessing';
 import { RenderPass } from 'three-stdlib';
 import { EdgesEffect } from './EdgesEffect';
 import { DownSampleEffect } from './DownsampleEffect';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
-extend({ DepthDownsamplingPass, DepthPass, NormalPass, RenderPass });
+extend({ DepthDownsamplingPass, DepthPass, EffectPass, NormalPass, RenderPass });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -39,14 +39,55 @@ function Effects() {
     details: { min: 0, max: 2.0, step: 0.1, value: 0.3 },
 	});
 
+  // const { gl } = useThree();
+  // gl.setSize(144, 144);
+  const { gl, size } = useThree();
+	const resolution = new Vector2(size.width, size.height).divideScalar(controls.granularity).round();
+  	const renderTexture = useFBO({
+      generateMipmaps: false,
+      magFilter: NearestFilter,
+      minFilter: NearestFilter,
+      stencilBuffer: false,
+		  depthBuffer: true,
+		  depthTexture: new DepthTexture(resolution.x, resolution.y)
+	});
+	// renderTexture.setSize(resolution.x, resolution.y);
+  // gl.setPixelRatio(controls.granularity);
+  // gl.setViewport(0, 0, resolution.x, resolution.y);
+  // gl.setSize(resolution.x, resolution.y);
+
+  const normalTexture = useFBO({
+		generateMipmaps: false,
+		magFilter: NearestFilter,
+		minFilter: NearestFilter,
+		stencilBuffer: false
+	});
+	normalTexture.setSize(resolution.x, resolution.y);
+	// const normalMaterial = new MeshNormalMaterial();
+
+	useFrame(({ camera, gl, scene }) => {
+    // gl.getContext().colorMask(false, false, false, false);
+		// gl.setRenderTarget(renderTexture);
+		// gl.render(scene, camera);
+		// gl.setRenderTarget(null);
+		
+		// render normal texture
+		// const sceneMaterial = state.scene.overrideMaterial;
+		// state.gl.setRenderTarget(normalTexture)
+		// state.scene.overrideMaterial = normalMaterial;
+		// state.gl.render(state.scene, state.camera);
+		// state.scene.overrideMaterial = sceneMaterial
+	});
+
   return <EffectComposer depthBuffer multisampling={0}>
-    {/* <renderPass/> */}
-    <depthDownsamplingPass/>
+    <renderPass/>
+    <effectPass/>
+    {/* <depthDownsamplingPass/> */}
     {/* <depthPass/> */}
     {/* <normalPass/> */}
-    <DownSampleEffect {...controls}/>
+    {/* <DownSampleEffect {...controls}/> */}
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
-    {/* <EdgesEffect {...controls}/> */}
+    <EdgesEffect {...controls}/>
   </EffectComposer>
 }
 
@@ -59,9 +100,9 @@ function Environment() {
   const { viewport } = useThree();
   // const thr =  useThree();
 
-  useFrame(({ camera, viewport }) => {
-    pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
-  });
+  // useFrame(({ camera, viewport }) => {
+  //   pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
+  // });
 
 return <>
     <OrthographicCamera
@@ -69,7 +110,7 @@ return <>
       far={5}
       left={-viewport.aspect}
       makeDefault
-      near={0.1}
+      near={.1}
       // onUpdate={console.log}
       position={[ 0, 2 * Math.tan(Math.PI / 6), 2]}
       right={viewport.aspect}
