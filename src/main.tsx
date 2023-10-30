@@ -33,8 +33,8 @@ function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
 		granularity: { min: 1, max: 32, step: 1, value: 8 },
-    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.4 },
-    details: { min: 0, max: 2.0, step: 0.1, value: 0.3 },
+    outlines: { min: 0, max: 1.0, step: 0.1, value: 0.6 },
+    details: { min: 0, max: 2.0, step: 0.1, value: 0.6 },
 	});
 
   return <EffectComposer depthBuffer multisampling={0}>
@@ -112,16 +112,16 @@ function Scene() {
       <pointLight
         color={0x2379cf}
         decay={.5}
-        distance={1.5}
-        intensity={4}
+        distance={1}
+        intensity={8}
         // castShadow
       />
     </Gem>
-    <Ball
+    {/* <Ball
       position={[0, 0.2 / 2, 0]}
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.1, 0.1, 0.1]}
-    />
+    /> */}
     <Box
       position={[.4, 0.4 / 2, 0]}
       rotation={[0, Math.PI / 4, 0]}
@@ -156,8 +156,8 @@ function Ball({
     receiveShadow
   >
     <sphereGeometry/>
-    <meshToonMaterial map={texture} />
-    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
+    {/* <meshToonMaterial map={texture} /> */}
+    <meshPhongMaterial map={texture} />
   </mesh>
 }
 
@@ -183,10 +183,11 @@ function Box({
     position={position}
     rotation={rotation}
     receiveShadow
+    scale={scale}
   >
-    <boxGeometry args={[...scale]} />
-    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
-    <meshToonMaterial map={texture} />
+    <boxGeometry />
+    <meshPhongMaterial map={texture} />
+    {/* <meshToonMaterial map={texture} /> */}
   </mesh>
 }
 
@@ -242,8 +243,8 @@ function Plane({
 
   return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
     <planeGeometry />
-    {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
-    <meshToonMaterial map={texture} />
+    <meshPhongMaterial map={texture} />
+    {/* <meshToonMaterial map={texture} /> */}
   </mesh>
 }
 

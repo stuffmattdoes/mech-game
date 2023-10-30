@@ -34,7 +34,7 @@ float getOutline(float depth) {
     // diff += clamp(getDepth(-1, -1) - depth, 0.0, 1.0);  // bot left
     // diff += clamp(getDepth(-1, 1) - depth, 0.0, 1.0);   // top left
 
-    return floor(smoothstep(0.01, 0.02, diff) * 2.0) / 2.0;
+    return floor(smoothstep(0.01, 0.04, diff) * 2.0) / 2.0;
 }
 
 float getNeighborDetail(int x, int y, float depth, vec3 normal) {
@@ -50,6 +50,7 @@ float getNeighborDetail(int x, int y, float depth, vec3 normal) {
     float depthIndicator = clamp(sign(depthDiff * 0.25 + 0.0025), 0.0, 1.0);
 
     return (1.0 - dot(normal, neighborNormal)) * depthIndicator * normalIndicator;
+    // return distance(normal, neighborNormal) * depthIndicator * normalIndicator;
 }
 
 float getDetail(float depth, vec3 normal) {
@@ -67,23 +68,10 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
     #ifdef ENABLED
         // vec4 texel = texture2D(inputBuffer, vUv);
         vec4 texel = texture2D(tDiffuse, vUv);
-
-        vec3 normal = vec3(0.0);
-        float _depth = 0.0;
-
-        if (outlineStrength > 0.0 || detailStrength > 0.0) {
-            _depth = getDepth(0, 0);
-            normal = getNormal(0, 0);
-        }
-
-        float outline = 0.0;
-        if (outlineStrength > 0.0)
-            outline = getOutline(_depth);
-
-        float detail = 0.0;
-        if (detailStrength > 0.0)
-            detail = getDetail(_depth, normal);
-
+        float _depth = getDepth(0, 0);
+        vec3 normal = getNormal(0, 0);
+        float outline = getOutline(_depth);
+        float detail = getDetail(_depth, normal);
         float strength = outline > 0.0
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
