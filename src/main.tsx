@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NearestFilter, OrthographicCamera as IOrthographicCamera, RepeatWrapping } from 'three';
+import { NearestFilter, OrthographicCamera as IOrthographicCamera, RepeatWrapping, MOUSE } from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
@@ -93,7 +93,17 @@ return <>
       // shadow-normalBias={-0.02}
       shadow-radius={0}
     />
-    <OrbitControls />
+    <OrbitControls
+      // enableRotate={false}
+      enableZoom={false}
+      minAzimuthAngle={45}
+      screenSpacePanning
+      mouseButtons={{
+        LEFT: MOUSE.PAN,
+        MIDDLE: MOUSE.DOLLY,
+        RIGHT: MOUSE.ROTATE
+      }}
+    />
   </>
 }
 
@@ -125,14 +135,14 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
-    <Plane />
+    <Plane scale={5} />
   </scene>
 }
 
 interface IGameObject {
   position?: [x: number, y: number, z: number],
   rotation?: [x: number, y: number, z: number],
-  scale?: [x: number, y: number, z: number]
+  scale?: [x: number, y: number, z: number] | number
 }
 function Ball({
   position = [0, 0, 0],
@@ -218,12 +228,14 @@ const Gem: React.FC<PropsWithChildren<IGameObject>> = ({
   </mesh>
 }
 
-function Plane() {
+function Plane({
+  scale = 1
+}: IGameObject) {
   const texture = useTexture('textures/checker2.png',
     (tex) => {
       if (Array.isArray(tex))
         return tex;
-      tex.repeat.set(3, 3);
+      tex.repeat.set(scale * 1.5, scale * 1.5);
       tex.minFilter = NearestFilter;
       tex.magFilter = NearestFilter;
       tex.generateMipmaps = false;
@@ -231,8 +243,8 @@ function Plane() {
       tex.wrapT = RepeatWrapping;
     });
 
-  return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-    <planeGeometry args={[2, 2]} />
+  return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
+    <planeGeometry />
     {/* <meshPhongMaterial args={[{ map: texture }]} /> */}
     <meshToonMaterial map={texture} />
   </mesh>
