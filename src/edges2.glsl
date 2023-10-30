@@ -64,7 +64,7 @@ float getDetail(float depth, vec3 normal) {
     return step(0.1, indicator);
 }
 
-void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {
+void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
     #ifdef ENABLED
         // vec4 texel = texture2D(inputBuffer, vUv);
         vec4 texel = inputColor;

@@ -7,7 +7,7 @@ import { EffectComposer, EffectComposerContext } from '@react-three/postprocessi
 import { useControls } from 'leva';
 import { DepthDownsamplingPass, DepthPass, EffectPass, NormalPass } from 'postprocessing';
 import { RenderPass } from 'three-stdlib';
-import { EdgesEffect } from './EdgesEffect';
+import { EdgesEffect } from './Edges2';
 import { DownSampleEffect } from './DownsampleEffect';
 import './styles.css';
 
@@ -132,10 +132,10 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
-    <Ball
+    {/* <Ball
       position={[0, 0.1, 0]}
       scale={0.1}
-    />
+    /> */}
     <Plane />
   </scene>
 }

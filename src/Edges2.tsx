@@ -5,7 +5,7 @@ import { BlendFunction, EffectAttribute, Effect } from 'postprocessing';
 import { useFrame } from '@react-three/fiber';
 import { useFBO } from '@react-three/drei';
 // @ts-ignore
-import edgeShader from './edges.glsl';
+import edgeShader from './edges2.glsl';
 
 // This effect is influenced by https://threejs.org/examples/#webgl_postprocessing_pixel
 // About webgl shader variables https://threejs.org/docs/index.html#api/en/renderers/webgl/WebGLProgram
@@ -25,7 +25,7 @@ class Edges extends Effect {
 			'EdgesEffect',
 			edgeShader,
 			{
-				attributes: EffectAttribute.DEPTH,
+				// attributes: EffectAttribute.CONVOLUTION,
 				blendFunction: BlendFunction.NORMAL,
 				defines: new Map([
 					['ENABLED', String(enabled)]
