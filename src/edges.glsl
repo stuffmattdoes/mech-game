@@ -16,7 +16,8 @@ float getDepth(int x, int y) {
 }
 
 vec3 getNormal(int x, int y) {
-    return texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0;
+    return normalize(texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0);
+    // return texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0;
 }
 
 float getOutline(float depth) {
@@ -28,18 +29,15 @@ float getOutline(float depth) {
     diff += clamp(getDepth(0, -1) - depth, 0.0, 1.0);   // bot
     diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);   // mid left
 
-    // few more samples, this time diagonally adjacent
-    // diff += clamp(getDepth(1, 1) - depth, 0.0, 1.0);    // top right
-    // diff += clamp(getDepth(1, -1) - depth, 0.0, 1.0);   // bot right
-    // diff += clamp(getDepth(-1, -1) - depth, 0.0, 1.0);  // bot left
-    // diff += clamp(getDepth(-1, 1) - depth, 0.0, 1.0);   // top left
-
     return floor(smoothstep(0.01, 0.04, diff) * 2.0) / 2.0;
 }
 
 // TODO: no line on concave surface
-// if dot product > 0.0, normal vectors are aligned/facing toward (concave)
-// if dot product < 0.0, normal vectors are facing apart (convex)
+// if dot product = 1.0, normals are parallel aligned
+// if dot product > 0.0, normals are facing toward (concave)
+// if dot product < 0.0, normals are facing apart (convex)
+// if dot product = 0.0, normals are perpendicular
+// if dot product = -1.0, normals are parallel aligned opposite
 
 float getNeighborDetail(int x, int y, float thisDepth, vec3 thisNormal) {
     vec3 neighborNormal = getNormal(x, y);
@@ -81,8 +79,10 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-        // outputColor = vec4(inputColor.rgb * strength, inputColor.a);
+        // float strength = (1.0 + detailStrength * detail);
+
         outputColor = vec4(texel.rgb * strength, inputColor.a);
+        // outputColor = vec4(normal * strength, inputColor.a);
     #else
         outputColor = inputColor;
     #endif
