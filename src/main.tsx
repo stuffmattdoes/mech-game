@@ -89,7 +89,9 @@ return <>
       position={[60, 50, 100]}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
-      // shadow-radius={0}
+      // shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
+      // shadow-normalBias={-0.02}
+      shadow-radius={0}
     />
     <OrbitControls />
   </>
