@@ -37,19 +37,30 @@ float getOutline(float depth) {
     return floor(smoothstep(0.01, 0.04, diff) * 2.0) / 2.0;
 }
 
+// TODO: no line on concave surface
+// if dot product > 0.0, normal vectors are aligned/facing toward (concave)
+// if dot product < 0.0, normal vectors are facing apart (convex)
+
 float getNeighborDetail(int x, int y, float depth, vec3 normal) {
     float depthDiff = getDepth(x, y) - depth;
     vec3 neighborNormal = getNormal(x, y);
     
-    // Edge pixels should offset to faces who's normals are closer to the bias normal.
-    vec3 normalEdgeOffset = vec3(1.0, 1.0, 1.0);
-    float normalDiff = dot(normal - neighborNormal, normalEdgeOffset);
+    // Outline should bias towards normals that are pointed in similar direction to the bias normal.
+    vec3 normalEdgeRef = vec3(1.0, 1.0, 1.0); // vector pointing to top right and towards camera
+    float normalDiff = dot(normal - neighborNormal, normalEdgeRef);
     float normalIndicator = clamp(smoothstep(-0.01, 0.02, normalDiff), 0.0, 1.0);
 
-    // Only the shallower pixel should detect the normal edge.
+    // Pixel closest to the screen should detect the normal edge.
     float depthIndicator = clamp(sign(depthDiff * 0.25 + 0.0025), 0.0, 1.0);
+    float dotProduct = dot(normal, neighborNormal);
+    
+    // if (dotProduct < 0.0) {
+    //     return (1.0 - dotProduct) * depthIndicator * normalIndicator;
+    // } else {
+    //     return 0.0;
+    // }
 
-    return (1.0 - dot(normal, neighborNormal)) * depthIndicator * normalIndicator;
+    return (1.0 - dotProduct) * depthIndicator * normalIndicator;
     // return distance(normal, neighborNormal) * depthIndicator * normalIndicator;
 }
 
