@@ -98,11 +98,11 @@ return <>
       enableZoom={false}
       minAzimuthAngle={45}
       screenSpacePanning
-      mouseButtons={{
-        LEFT: MOUSE.PAN,
-        MIDDLE: MOUSE.DOLLY,
-        RIGHT: MOUSE.ROTATE
-      }}
+      // mouseButtons={{
+      //   LEFT: MOUSE.PAN,
+      //   MIDDLE: MOUSE.DOLLY,
+      //   RIGHT: MOUSE.ROTATE
+      // }}
     />
   </>
 }
@@ -135,7 +135,7 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
-    <Plane scale={5} />
+    <Plane scale={2} />
   </scene>
 }
 
