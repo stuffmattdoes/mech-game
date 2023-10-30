@@ -8,6 +8,7 @@ import { useControls } from 'leva';
 import { DepthDownsamplingPass, DepthPass, EffectPass, NormalPass } from 'postprocessing';
 import { RenderPass } from 'three-stdlib';
 import { EdgesEffect } from './Edges2';
+import { ConvolutionEffect } from './Convolution';
 import { DownSampleEffect } from './DownsampleEffect';
 import './styles.css';
 
@@ -52,7 +53,8 @@ function Effects() {
     {/* <normalPass/> */}
     <DownSampleEffect {...controls} resolution={resolution}/>
     {/* normalPass is handled in depthDownSamplingPass if a normal buffer is provided to it */}
-    <EdgesEffect {...controls} resolution={resolution}/>
+    {/* <EdgesEffect {...controls} resolution={resolution}/> */}
+    <ConvolutionEffect {...controls} resolution={resolution} />
     {/* <effectPass/> */}
   </EffectComposer>
 }
