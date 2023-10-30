@@ -51,9 +51,9 @@ function Loader() {
 function Environment() {
   const { viewport } = useThree();
 
-  useFrame(({ camera, viewport }) => {
-    pixelCameraDolly(camera as IOrthographicCamera, viewport.aspect, 144, 120);
-  });
+  // useFrame(({ camera, viewport }) => {
+  //   snapCameraToPixels(camera as IOrthographicCamera, viewport.aspect, 144, 120);
+  // });
 
 return <>
     <OrthographicCamera
@@ -248,7 +248,7 @@ function Plane({
   </mesh>
 }
 
-function pixelCameraDolly(
+function snapCameraToPixels(
   camera: IOrthographicCamera,
   aspectRatio: number,
   pixelsPerScreenWidth: number,
