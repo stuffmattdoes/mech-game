@@ -17,7 +17,7 @@ float getDepth(int x, int y) {
 
 vec3 getNormal(int x, int y) {
     return normalize(texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0);
-    // return texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb * 2.0 - 1.0;
+    // return normalize(texture2D(tNormal, vUv + vec2(x, y) * (1.0 / resolution.xy)).rgb);
 }
 
 float getOutline(float depth) {
@@ -25,9 +25,9 @@ float getOutline(float depth) {
 
     // sample pixel depths above and beside current pixel
     diff += clamp(getDepth(0, 1) - depth, 0.0, 1.0);    // top
-    diff += clamp(getDepth(1, 0) - depth, 0.0, 1.0);    // mid right
+    diff += clamp(getDepth(1, 0) - depth, 0.0, 1.0);    // right
     diff += clamp(getDepth(0, -1) - depth, 0.0, 1.0);   // bot
-    diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);   // mid left
+    diff += clamp(getDepth(-1, 0) - depth, 0.0, 1.0);   // left
 
     return floor(smoothstep(0.01, 0.04, diff) * 2.0) / 2.0;
 }
@@ -38,31 +38,41 @@ float getOutline(float depth) {
 // if dot product < 0.0, normals are facing apart (convex)
 // if dot product = 0.0, normals are perpendicular
 // if dot product = -1.0, normals are parallel aligned opposite
-
 float getNeighborDetail(int x, int y, float thisDepth, vec3 thisNormal) {
-    vec3 neighborNormal = getNormal(x, y);
-    
+    vec3 neighborNormal = getNormal(x, y);    
     // Outline should bias towards normals that are pointed in similar direction to the bias normal.
-    vec3 normalEdgeRef = vec3(1.0, 1.0, 1.0); // vector pointing to top right and towards camera
-    float normalBias = dot(thisNormal - neighborNormal, normalEdgeRef);
+    vec3 normalBiasRef = vec3(1.0, 1.0, 1.0); // vector pointing to top right and towards camera
+    float normalBias = dot(thisNormal - neighborNormal, normalBiasRef);
+
+    /*
+        smoothstep(-0.01, 0.02, normalBias) applies a smooth step function to normalBias in the range (-0.01, 0.02)
+        
+        this means detailIndicator will be:
+        * 0.0 when normalBias is less than -0.01
+        * 1.0 when normalBias is greater than 0.02
+        * smoothly interpolated between 0.0 and 1.0 when normalBias is between -0.01 and 0.02.
+        * clamp(..., 0.0, 1.0) ensures that the detailIndicator is always within the range [0.0, 1.0].
+
+    */
     float detailIndicator = clamp(smoothstep(-0.01, 0.02, normalBias), 0.0, 1.0);
 
     // Pixel closest to the screen should detect the normal edge.
     float depthDiff = getDepth(x, y) - thisDepth;
     float outlineIndicator = clamp(sign(depthDiff * 0.25 + 0.0025), 0.0, 1.0);
+    
     float dotProduct = dot(thisNormal, neighborNormal);
-
-    return (1.0 - dotProduct) * outlineIndicator * detailIndicator;
+    return (1.0 - dotProduct) * detailIndicator * outlineIndicator;
     // return distance(thisNormal, neighborNormal) * outlineIndicator * detailIndicator;
 }
 
 float getDetail(float depth, vec3 normal) {
     float indicator = 0.0;
 
-    indicator += getNeighborDetail(0, -1, depth, normal);
-    indicator += getNeighborDetail(0, 1, depth, normal);
-    indicator += getNeighborDetail(-1, 0, depth, normal);
-    indicator += getNeighborDetail(1, 0, depth, normal);
+    // sample neighboring pixels to determine normals
+    indicator += getNeighborDetail(0, 1, depth, normal);    // top
+    indicator += getNeighborDetail(1, 0, depth, normal);    // right
+    indicator += getNeighborDetail(0, -1, depth, normal);   // bot
+    indicator += getNeighborDetail(-1, 0, depth, normal);   // left
 
     return step(0.1, indicator);
 }
@@ -79,10 +89,9 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
             ? (1.0 - outlineStrength * outline)
             : (1.0 + detailStrength * detail);
 
-        // float strength = (1.0 + detailStrength * detail);
-
-        outputColor = vec4(texel.rgb * strength, inputColor.a);
         // outputColor = vec4(normal * strength, inputColor.a);
+        // outputColor = vec4(_depth * strength, _depth * strength, _depth * strength, inputColor.a);
+        outputColor = vec4(texel.rgb * strength, inputColor.a);
     #else
         outputColor = inputColor;
     #endif
