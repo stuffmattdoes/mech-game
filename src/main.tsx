@@ -2,7 +2,7 @@ import React, { PropsWithChildren, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { NearestFilter, OrthographicCamera as IOrthographicCamera, RepeatWrapping, MOUSE, Vector3, Quaternion } from 'three';
 import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, OrthographicCamera, StatsGl, Wireframe, useFBX, useProgress, useTexture } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
@@ -94,7 +94,7 @@ return <>
     />
     <OrbitControls
       // enableRotate={false}
-      enableZoom={false}
+      // enableZoom={false}
       minAzimuthAngle={45}
       screenSpacePanning
       // mouseButtons={{
@@ -132,6 +132,7 @@ function Scene() {
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.2, 0.2, 0.2]}
     />
+    <Player/>
     <Plane scale={2} />
   </scene>
 }
@@ -246,6 +247,25 @@ function Plane({
     <meshPhongMaterial depthWrite={false} map={texture} />
     {/* <meshToonMaterial map={texture} /> */}
   </mesh>
+}
+
+function Player() {
+  const fbx = useFBX('/models/characterMedium.fbx');
+  const texture = useTexture('/textures/criminalMaleA.png');
+
+  return <mesh receiveShadow>
+    <primitive
+      object={fbx}
+      scale={0.0015}
+      position={[0, 0, 0]}
+    />;
+    <meshToonMaterial map={texture} />
+  </mesh>;
+  // return <primitive
+  //   object={fbx}
+  //   scale={0.0015}
+  //   position={[0, 0, 0]}
+  // />;
 }
 
 function snapCameraToPixels(
