@@ -243,7 +243,7 @@ function Plane({
 
   return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
     <planeGeometry />
-    <meshPhongMaterial map={texture} />
+    <meshPhongMaterial depthWrite={false} map={texture} />
     {/* <meshToonMaterial map={texture} /> */}
   </mesh>
 }
