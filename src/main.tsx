@@ -107,7 +107,20 @@ return <>
       // shadow-blurSamples={0}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
-      // shadow-radius={0}
+      // shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
+      // shadow-normalBias={-0.02}
+      shadow-radius={0}
+    />
+    <OrbitControls
+      // enableRotate={false}
+      // enableZoom={false}
+      minAzimuthAngle={45}
+      screenSpacePanning
+      // mouseButtons={{
+      //   LEFT: MOUSE.PAN,
+      //   MIDDLE: MOUSE.DOLLY,
+      //   RIGHT: MOUSE.ROTATE
+      // }}
     />
     <OrbitControls />
   </>
@@ -125,7 +138,7 @@ function Scene() {
       />
     </Gem>
     <Box
-      position={[.4, 0.4 / 2, 0]}
+      position={[.4, 0.4 / 2.0, 0]}
       rotation={[0, Math.PI / 4, 0]}
       scale={[0.4, 0.4, 0.4]}
     />
