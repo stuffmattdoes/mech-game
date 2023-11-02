@@ -61,7 +61,7 @@ function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
 
         if (downPressed && -linearVelocity.z < maxVelocity) {
             delta.z -= acceleration;
-        }        
+        }
 
         if (leftPressed && -linearVelocity.x < maxVelocity) {
             delta.x -= acceleration;
@@ -73,12 +73,11 @@ function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
 
         rigidBodyRef.current.applyImpulse(delta.normalize(), true);
         const nextRotation = rigidBodyRef.current.rotation();
-        if (rigidBodyRef.current.isMoving) {
-            // if (Math.abs(linearVelocity.x) > 0.1 || Math.abs(linearVelocity.z) > 0.1) {
-                // characterRef.current.rotation.y = Math.atan2(linearVelocity.x, linearVelocity.z);
-                nextRotation.y = Math.atan2(linearVelocity.x, linearVelocity.z);
-                rigidBodyRef.current.setRotation(nextRotation, true);
-            // }
+        console.log(nextRotation);
+        if (Math.abs(linearVelocity.x) > 0.1 || Math.abs(linearVelocity.z) > 0.1) {
+            // characterRef.current.rotation.y = Math.atan2(linearVelocity.x, linearVelocity.z);
+            nextRotation.y = Math.atan2(linearVelocity.x, linearVelocity.z);
+            rigidBodyRef.current.setRotation(nextRotation, true);
         }
     });
 
