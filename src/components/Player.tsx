@@ -1,9 +1,8 @@
 import { useFBX, useTexture } from "@react-three/drei";
 
 export function Player() {
-  const fbx = useFBX('/models/characterMedium.fbx');
   const texture = useTexture('/textures/criminalMaleA.png');
-  console.log(fbx);
+  const fbx = useFBX('/models/characterMedium.fbx');
   fbx.traverse((child) => {
     if (child.isMesh) {
       child.material.map = texture;
