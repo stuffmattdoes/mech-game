@@ -6,8 +6,12 @@ import { Html, OrbitControls, OrthographicCamera, StatsGl, Wireframe, useFBX, us
 import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
-import { Edges } from './Edges';
+import { Edges } from './effects/Edges';
 import './styles.css';
+import { Box } from './components/Box';
+import { Player } from './components/Player';
+import { Plane } from './components/Plane';
+import { Gem } from './components/Gem';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -110,11 +114,11 @@ function Scene() {
   return <scene>
     <Gem position={[0, 0.5, .25]}>
       <pointLight
+        // castShadow
         color={0x2379cf}
         decay={.5}
         distance={1}
         intensity={8}
-        // castShadow
       />
     </Gem>
     {/* <Ball
@@ -137,136 +141,7 @@ function Scene() {
   </scene>
 }
 
-interface IGameObject {
-  position?: [x: number, y: number, z: number],
-  rotation?: [x: number, y: number, z: number],
-  scale?: [x: number, y: number, z: number] | number
-}
-function Ball({
-  position = [0, 0, 0],
-  rotation = [0, 0, 0],
-  scale = [1, 1, 1]
-}: IGameObject) {
-  const texture = useTexture('textures/checker.png');
 
-  return <mesh
-    castShadow
-    position={position}
-    rotation={rotation}
-    scale={scale}
-    receiveShadow
-  >
-    <sphereGeometry/>
-    {/* <meshToonMaterial map={texture} /> */}
-    <meshPhongMaterial map={texture} />
-  </mesh>
-}
-
-function Box({
-  position = [0, 0, 0],
-  rotation = [0, 0, 0],
-  scale = [1, 1, 1]
-}: IGameObject) {
-  const texture = useTexture('textures/checker.png',
-    (tex) => {
-      if (Array.isArray(tex))
-        return tex;
-      tex.repeat.set(1.5, 1.5);
-      tex.minFilter = NearestFilter;
-      tex.magFilter = NearestFilter;
-      tex.generateMipmaps = false;
-      tex.wrapS = RepeatWrapping;
-      tex.wrapT = RepeatWrapping;
-    });
-
-  return <mesh
-    castShadow
-    position={position}
-    rotation={rotation}
-    receiveShadow
-    scale={scale}
-  >
-    <boxGeometry />
-    <meshPhongMaterial map={texture} />
-    {/* <meshToonMaterial map={texture} /> */}
-  </mesh>
-}
-
-const Gem: React.FC<PropsWithChildren<IGameObject>> = ({
-  children,
-  position = [0, 0, 0],
-  rotation = [0, 0, 0],
-  scale = [1, 1, 1]
-}) => {
-  const meshRef = React.useRef<any>();
-  const materialRef = React.useRef<any>();
-
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    meshRef.current.rotation.y = time;
-    meshRef.current.position.y = position[1] + Math.sin(time) / 8;
-    materialRef.current.emissiveIntensity = Math.sin(time * 5) + 5;
-  });
-
-  return <mesh
-    castShadow
-    position={position}
-    ref={meshRef}
-    rotation={rotation}
-    scale={scale}
-  >
-    <icosahedronGeometry args={[.15]} />
-    <meshPhongMaterial args={[{
-      color: 0x2379cf,
-      emissive: 0x143542,
-      shininess: 100,
-      specular: 0xffffff,
-    }]}
-      ref={materialRef} />
-      {children}
-  </mesh>
-}
-
-function Plane({
-  scale = 1
-}: IGameObject) {
-  const texture = useTexture('textures/checker2.png',
-    (tex) => {
-      if (Array.isArray(tex))
-        return tex;
-      tex.repeat.set(scale * 1.5, scale * 1.5);
-      tex.minFilter = NearestFilter;
-      tex.magFilter = NearestFilter;
-      tex.generateMipmaps = false;
-      tex.wrapS = RepeatWrapping;
-      tex.wrapT = RepeatWrapping;
-    });
-
-  return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
-    <planeGeometry />
-    <meshPhongMaterial depthWrite={false} map={texture} />
-    {/* <meshToonMaterial map={texture} /> */}
-  </mesh>
-}
-
-function Player() {
-  const fbx = useFBX('/models/characterMedium.fbx');
-  const texture = useTexture('/textures/criminalMaleA.png');
-
-  return <mesh receiveShadow>
-    <primitive
-      object={fbx}
-      scale={0.0015}
-      position={[0, 0, 0]}
-    />;
-    <meshToonMaterial map={texture} />
-  </mesh>;
-  // return <primitive
-  //   object={fbx}
-  //   scale={0.0015}
-  //   position={[0, 0, 0]}
-  // />;
-}
 
 function snapCameraToPixels(
   camera: IOrthographicCamera,
