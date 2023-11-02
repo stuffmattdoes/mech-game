@@ -16,7 +16,7 @@ export function Floor({ scale }: Partial<MeshProps>) {
         tex.wrapT = RepeatWrapping;
       });
   
-    return <RigidBody friction={1}>
+    return <RigidBody friction={5.0}>
       <mesh receiveShadow rotation={[-Math.PI / 2.0, 0.0, 0.0]} scale={scale}>
         <planeGeometry />
         {/* <meshPhongMaterial depthWrite={false} map={texture} /> */}

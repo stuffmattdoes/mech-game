@@ -1,5 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import { MeshProps } from "@react-three/fiber";
+import { RigidBody } from "@react-three/rapier";
 import { NearestFilter, RepeatWrapping } from "three";
 
 export function Box({ position, rotation, scale }: Partial<MeshProps>) {
@@ -15,15 +16,17 @@ export function Box({ position, rotation, scale }: Partial<MeshProps>) {
       tex.wrapT = RepeatWrapping;
     });
 
-  return <mesh
-    castShadow
-    position={position}
-    rotation={rotation}
-    receiveShadow
-    scale={scale}
-  >
-    <boxGeometry />
-    {/* <meshPhongMaterial map={texture} /> */}
-    <meshToonMaterial map={texture} />
-  </mesh>
+  return <RigidBody>
+    <mesh
+      castShadow
+      position={position}
+      rotation={rotation}
+      receiveShadow
+      scale={scale}
+    >
+      <boxGeometry />
+      {/* <meshPhongMaterial map={texture} /> */}
+      <meshToonMaterial map={texture} />
+    </mesh>
+  </RigidBody>
 }

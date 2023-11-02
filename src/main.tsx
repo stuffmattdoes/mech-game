@@ -23,9 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Suspense fallback={<Loader />}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
-          <Physics debug>
-            <PlayerTestScene />
-          </Physics>
+          <PlayerTestScene />
           <Effects />
         </Suspense>
       </Canvas>
@@ -36,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 1, max: 32, step: 1, value: 8 },
+		granularity: { min: 1, max: 32, step: 1, value: 5 },
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.6 },
     details: { min: 0, max: 2.0, step: 0.1, value: 0.6 },
 	});
@@ -68,8 +66,8 @@ return <>
       // near={0.1}
       // onUpdate={console.log}
       // position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
-      position={[ 0.0, 4.0, 0.0 ]}
-      zoom={0.75}
+      position={[ 4.0, 4.0, 4.0 ]}
+      zoom={0.35}
       right={viewport.aspect}
       top={1}
     >
@@ -90,9 +88,9 @@ return <>
     />
     <directionalLight
       castShadow
-      intensity={0.8}
+      intensity={0.5}
       color={0xfffc9c}
-      position={[60, 50, -2080]}
+      position={[60, 200, 270]}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
       // shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow

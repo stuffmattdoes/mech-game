@@ -15,7 +15,7 @@ export function Character(props: Partial<GroupProps>) {
   return (
     // @ts-ignore
     <group ref={group} {...props} dispose={null}>
-      <group scale={0.25}>
+      <group>
         <primitive object={nodes.LeftFootCtrl} />
         <primitive object={nodes.RightFootCtrl} />
         <primitive object={nodes.HipsCtrl} />
