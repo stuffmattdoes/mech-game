@@ -19,9 +19,4 @@ export function Player() {
     {/* <meshPhongMaterial map={texture}/> */}
     {/* <meshStandardMaterial map={texture}/> */}
   </mesh>;
-  // return <primitive
-  //   object={fbx}
-  //   scale={0.0015}
-  //   position={[0, 0, 0]}
-  // />;
 }

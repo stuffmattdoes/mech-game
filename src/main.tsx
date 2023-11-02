@@ -7,7 +7,7 @@ import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
-import { Box, Gem, Plane, Player } from './components';
+import { PlayerTestScene, TestScene } from './scenes';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
@@ -22,7 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Suspense fallback={<Loader />}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
-          <Scene />
+          <PlayerTestScene />
           <Effects />
         </Suspense>
       </Canvas>
@@ -106,39 +106,6 @@ return <>
     />
   </>
 }
-
-function Scene() {
-  return <scene>
-    <Gem position={[0, 0.5, .25]}>
-      <pointLight
-        // castShadow
-        color={0x2379cf}
-        decay={.5}
-        distance={1}
-        intensity={8}
-      />
-    </Gem>
-    {/* <Ball
-      position={[0, 0.2 / 2, 0]}
-      rotation={[0, Math.PI / 4, 0]}
-      scale={[0.1, 0.1, 0.1]}
-    /> */}
-    <Box
-      position={[.4, 0.4 / 2, 0]}
-      rotation={[0, Math.PI / 4, 0]}
-      scale={[0.4, 0.4, 0.4]}
-    />
-    <Box
-      position={[-.4, 0.2 / 2, 0]}
-      rotation={[0, Math.PI / 4, 0]}
-      scale={[0.2, 0.2, 0.2]}
-    />
-    <Player/>
-    <Plane scale={2} />
-  </scene>
-}
-
-
 
 function snapCameraToPixels(
   camera: IOrthographicCamera,
