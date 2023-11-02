@@ -25,8 +25,8 @@ export function Player() {
   ]}>
     <Ecctrl
       accDeltaTime={1.0}
-      capsuleHalfHeight={0.3}
-      capsuleRadius={0.1}
+      // capsuleHalfHeight={0.3}
+      // capsuleRadius={0.1}
       maxVelLimit={1.2}
       moveImpulsePointY={0.0}
       turnSpeed={1000}
