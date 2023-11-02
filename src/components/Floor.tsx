@@ -1,8 +1,9 @@
 import { useTexture } from "@react-three/drei";
 import { MeshProps } from "@react-three/fiber";
+import { RigidBody } from "@react-three/rapier";
 import { NearestFilter, RepeatWrapping } from "three";
 
-export function Plane({ scale }: Partial<MeshProps>) {
+export function Floor({ scale }: Partial<MeshProps>) {
     const texture = useTexture('textures/checker2.png',
       (tex) => {
         if (Array.isArray(tex))
@@ -15,9 +16,11 @@ export function Plane({ scale }: Partial<MeshProps>) {
         tex.wrapT = RepeatWrapping;
       });
   
-    return <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
-      <planeGeometry />
-      {/* <meshPhongMaterial depthWrite={false} map={texture} /> */}
-      <meshToonMaterial depthWrite={false} map={texture} />
-    </mesh>
+    return <RigidBody friction={1}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
+        <planeGeometry />
+        {/* <meshPhongMaterial depthWrite={false} map={texture} /> */}
+        <meshToonMaterial depthWrite={false} map={texture} />
+      </mesh>
+    </RigidBody>
   }

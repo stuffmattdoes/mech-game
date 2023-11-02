@@ -1,9 +1,10 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion } from 'three';
+import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion, Euler } from 'three';
 import { Canvas, extend, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
+import { Physics } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
@@ -22,7 +23,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Suspense fallback={<Loader />}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
           <Environment />
-          <PlayerTestScene />
+          <Physics debug>
+            <PlayerTestScene />
+          </Physics>
           <Effects />
         </Suspense>
       </Canvas>
@@ -59,29 +62,32 @@ function Environment() {
 return <>
     <OrthographicCamera
       bottom={-1}
-      far={5}
+      // far={5}
       left={-viewport.aspect}
       makeDefault
-      near={0.1}
+      // near={0.1}
       // onUpdate={console.log}
-      position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
+      // position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
+      position={[ 0.0, 4.0, 0.0 ]}
+      zoom={0.75}
       right={viewport.aspect}
       top={1}
-    />
+    >
+      {/* <spotLight
+        angle={Math.PI / 6}
+        castShadow
+        // color={0xff8800}
+        decay={2}
+        distance={10}
+        intensity={5}
+        penumbra={.02}
+        position={[0, 2, 1]}
+      /> */}
+    </OrthographicCamera>
     <ambientLight
       color={0x2d3645}
       intensity={2}
     />
-    {/* <spotLight
-      angle={Math.PI / 6}
-      castShadow
-      color={0xff8800}
-      decay={2}
-      distance={10}
-      intensity={1}
-      penumbra={.02}
-      position={[0, 1, 0]}
-    /> */}
     <directionalLight
       castShadow
       intensity={0.8}
