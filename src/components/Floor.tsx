@@ -17,7 +17,7 @@ export function Floor({ scale }: Partial<MeshProps>) {
       });
   
     return <RigidBody friction={1}>
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
+      <mesh receiveShadow rotation={[-Math.PI / 2.0, 0.0, 0.0]} scale={scale}>
         <planeGeometry />
         {/* <meshPhongMaterial depthWrite={false} map={texture} /> */}
         <meshToonMaterial depthWrite={false} map={texture} />
