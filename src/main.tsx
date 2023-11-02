@@ -92,7 +92,7 @@ return <>
       castShadow
       intensity={0.8}
       color={0xfffc9c}
-      position={[60, 50, 100]}
+      position={[60, 50, -2080]}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
       // shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
