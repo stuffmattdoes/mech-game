@@ -1,9 +1,8 @@
-import { Euler } from "three";
-import { Floor, Player } from "../components";
+import { CharacterController, Floor } from "../components";
 
 export function PlayerTestScene() {
     return <scene>
-        <Player />
+        <CharacterController />
         <Floor rotation={[20.0, 0, 0]} scale={10} />
     </scene>
 }
