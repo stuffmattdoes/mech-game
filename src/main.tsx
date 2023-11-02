@@ -1,17 +1,14 @@
-import React, { PropsWithChildren, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { NearestFilter, OrthographicCamera as IOrthographicCamera, RepeatWrapping, MOUSE, Vector3, Quaternion } from 'three';
-import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, StatsGl, Wireframe, useFBX, useProgress, useTexture } from '@react-three/drei';
+import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion } from 'three';
+import { Canvas, extend, useThree } from '@react-three/fiber';
+import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
+import { Box, Gem, Plane, Player } from './components';
 import './styles.css';
-import { Box } from './components/Box';
-import { Player } from './components/Player';
-import { Plane } from './components/Plane';
-import { Gem } from './components/Gem';
 
 const NODE_ENV = process.env.NODE_ENV;
 
