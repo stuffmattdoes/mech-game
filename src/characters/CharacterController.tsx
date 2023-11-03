@@ -1,5 +1,5 @@
 // import { Duck as Character } from '.';
-import { Criminal as Character } from '.';
+import { Criminal as Character } from '../components';
 import { KeyboardControls, useKeyboardControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { CapsuleCollider, RapierRigidBody, RigidBody } from '@react-three/rapier';
@@ -66,10 +66,14 @@ function CharacterControllerBody({ maxVelocity }: Props) {
             delta.x = 1.0;
         }
 
-        // const nextRotation = rigidBody.current.rotation();
         rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
+        const { x, y, z} = rigidBody.current.translation();
+        camera.lookAt(new Vector3(x, y, z));
+        camera.position.setX(x);
+        camera.position.setZ(z + 5.0);
 
         if (rigidBody.current.isMoving()) {
+
             rigidBody.current.setRotation(
                 new Quaternion().setFromEuler(new Euler(0.0, Math.atan2(delta.x, delta.z), 0.0)),
                 true
