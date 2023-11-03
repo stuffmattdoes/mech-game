@@ -18,7 +18,8 @@ export const Controls = {
 export function CharacterController() {
     const controls = useControls('Player Controls', {
         acceleration: { min: 0.1, max: 1.0, step: 0.1, value: 0.1 },
-        maxVelocity: { min: 0.5, max: 4.0, step: 0.2, value: 2.0 }
+        maxVelocity: { min: 0.5, max: 4.0, step: 0.2, value: 2.0 },
+        cameraLookat: true
     })
     return <group>
         <KeyboardControls map={[
@@ -34,11 +35,12 @@ export function CharacterController() {
 }
 
 type Props = {
+    acceleration: number,
+    cameraLookat: boolean,
     maxVelocity: number
-    acceleration: number
 }
 
-function CharacterControllerBody({ maxVelocity }: Props) {
+function CharacterControllerBody({ cameraLookat, maxVelocity }: Props) {
     const rigidBody = useRef<RapierRigidBody>() as React.MutableRefObject<RapierRigidBody>;
     const actionPressed = useKeyboardControls((state) => state[Controls.Action]);
     const downPressed = useKeyboardControls((state) => state[Controls.Down]);
@@ -52,19 +54,19 @@ function CharacterControllerBody({ maxVelocity }: Props) {
         const delta = new Vector3(0.0, 0.0, 0.0);
         const currentVelocity = rigidBody.current.linvel();
 
-        if (upPressed && currentVelocity.z < maxVelocity) {
+        if (upPressed) {
             delta.z = -1.0;
         }
 
-        if (downPressed && currentVelocity.z > -maxVelocity) {
+        if (downPressed) {
             delta.z = 1.0;
         }
 
-        if (rightPressed && currentVelocity.x > -maxVelocity) {
+        if (rightPressed) {
             delta.x = 1.0;
         }
 
-        if (leftPressed && currentVelocity.x < maxVelocity) {
+        if (leftPressed) {
             delta.x = -1.0;
         }
 
@@ -72,8 +74,18 @@ function CharacterControllerBody({ maxVelocity }: Props) {
         // rigidBody.current.applyImpulse(delta.normalize(), true);
         
         // Camera follow
+        // camera.lookAt(new Vector3(
+        //     camera.position.x,
+        //     camera.position.y + 4.0,
+        //     camera.position.z + 4.0
+        // ));
+
         const charPos = rigidBody.current.translation();
-        camera.lookAt(new Vector3(charPos.x, charPos.y, charPos.z));
+
+        if (cameraLookat) {
+            camera.lookAt(new Vector3(charPos.x, charPos.y, charPos.z));
+        }
+
         // camera.position.lerp(new Vector3(charPos.x, 10, charPos.z + 10), 0.1);
         camera.position.set(charPos.x, 10, charPos.z + 10);
 

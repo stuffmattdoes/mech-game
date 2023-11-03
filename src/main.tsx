@@ -62,11 +62,12 @@ return <>
       bottom={-1}
       // far={5}
       left={-viewport.aspect}
+      rotation={[0, 0, 0]}
       makeDefault
       // near={0.1}
       // onUpdate={console.log}
       // position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
-      // position={[ 4.0, 4.0, 4.0 ]}
+      position={[ 0, 4.0, 4.0 ]}
       zoom={0.35}
       right={viewport.aspect}
       top={1}
@@ -89,13 +90,13 @@ return <>
     <directionalLight
       intensity={0.4}
       color={0xfffc9c}
-      position={[60, 200, 270]}
+      position={[60, 400, 270]}
     />
     <directionalLight
       castShadow
       intensity={1}
       color={0xfffc9c}
-      position={[60, 200, 270]}
+      position={[60, 400, 270]}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
       shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
