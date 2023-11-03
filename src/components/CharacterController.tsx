@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { CapsuleCollider, RapierRigidBody, RigidBody } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { useRef } from 'react';
-import { Group, Object3DEventMap, Vector3 } from 'three';
+import { Euler, Group, Object3DEventMap, Quaternion, Vector3 } from 'three';
 
 export const Controls = {
     Action: 'action',
@@ -68,12 +68,13 @@ function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
             delta.x = 1.0;
         }
 
-        const nextRotation = rigidBody.current.rotation();
+        // const nextRotation = rigidBody.current.rotation();
         rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
-
         if (rigidBody.current.isMoving()) {
-            nextRotation.y = Math.atan2(delta.x, delta.z);
-            rigidBody.current.setRotation(nextRotation, true);
+            rigidBody.current.setRotation(
+                new Quaternion().setFromEuler(new Euler(0.0, Math.atan2(delta.x, delta.z), 0.0)),
+                true
+            );
         }
     });
 
