@@ -23,6 +23,7 @@ export function Character(props: Partial<GroupProps>) {
           castShadow
           geometry={nodes.characterMedium.geometry}
           material={materials['skin.001']}
+          receiveShadow
           skeleton={nodes.characterMedium.skeleton}
         />
       </group>

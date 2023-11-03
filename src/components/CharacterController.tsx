@@ -70,6 +70,7 @@ function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
 
         // const nextRotation = rigidBody.current.rotation();
         rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
+
         if (rigidBody.current.isMoving()) {
             rigidBody.current.setRotation(
                 new Quaternion().setFromEuler(new Euler(0.0, Math.atan2(delta.x, delta.z), 0.0)),
