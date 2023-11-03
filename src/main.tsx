@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 1, max: 32, step: 1, value: 5 },
+		granularity: { min: 1, max: 32, step: 1, value: 6 },
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.6 },
     details: { min: 0, max: 2.0, step: 0.1, value: 0.6 },
 	});
@@ -84,18 +84,24 @@ return <>
     </OrthographicCamera>
     <ambientLight
       color={0x2d3645}
-      intensity={2}
+      intensity={5}
+    />
+    <directionalLight
+      intensity={0.4}
+      color={0xfffc9c}
+      position={[60, 200, 270]}
     />
     <directionalLight
       castShadow
-      intensity={0.5}
+      intensity={1}
       color={0xfffc9c}
       position={[60, 200, 270]}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
-      // shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
+      shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
       // shadow-normalBias={-0.02}
-      shadow-radius={0}
+      // shadow-blurSamples={0}
+      // shadow-radius={0}
     />
     <OrbitControls
       // enableRotate={false}

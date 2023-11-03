@@ -17,7 +17,8 @@ export const Controls = {
 
 export function CharacterController() {
     const controls = useControls('Player Controls', {
-        maxVelocity: { min: 0.5, max: 4.0, step: 0.2, value: 2.0 },
+        acceleration: { min: 0.1, max: 1.0, step: 0.1, value: 0.1 },
+        maxVelocity: { min: 0.5, max: 4.0, step: 0.2, value: 2.0 }
     })
     return <group>
         <KeyboardControls map={[
@@ -47,22 +48,24 @@ function CharacterControllerBody({ maxVelocity }: Props) {
 
     useFrame(({ camera }) =>  {
         if (!rigidBody.current) return;
-        const delta = new Vector3(0.0, 0.0, 0.0);
 
-        if (upPressed) {
+        const delta = new Vector3(0.0, 0.0, 0.0);
+        const currentVelocity = rigidBody.current.linvel();
+
+        if (upPressed && currentVelocity.z < maxVelocity) {
             delta.z = -1.0;
         }
 
-        if (downPressed) {
+        if (downPressed && currentVelocity.z > -maxVelocity) {
             delta.z = 1.0;
         }
 
-        if (leftPressed) {
-            delta.x = -1.0;
+        if (rightPressed && currentVelocity.x > -maxVelocity) {
+            delta.x = 1.0;
         }
 
-        if (rightPressed) {
-            delta.x = 1.0;
+        if (leftPressed && currentVelocity.x < maxVelocity) {
+            delta.x = -1.0;
         }
 
         rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
@@ -76,7 +79,11 @@ function CharacterControllerBody({ maxVelocity }: Props) {
 
         if (rigidBody.current.isMoving()) {
             rigidBody.current.setRotation(
-                new Quaternion().setFromEuler(new Euler(0.0, Math.atan2(delta.x, delta.z), 0.0)),
+                new Quaternion().setFromEuler(new Euler(
+                    0.0,
+                    Math.atan2(delta.x, delta.z),
+                    0.0
+                )),
                 true
             );
         }
