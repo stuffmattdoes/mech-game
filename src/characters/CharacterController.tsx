@@ -39,14 +39,13 @@ type Props = {
 
 function CharacterControllerBody({ maxVelocity }: Props) {
     const rigidBody = useRef<RapierRigidBody>() as React.MutableRefObject<RapierRigidBody>;
-    const { camera } = useThree();
     const actionPressed = useKeyboardControls((state) => state[Controls.Action]);
     const downPressed = useKeyboardControls((state) => state[Controls.Down]);
     const leftPressed = useKeyboardControls((state) => state[Controls.Left]);
     const rightPressed = useKeyboardControls((state) => state[Controls.Right]);
     const upPressed = useKeyboardControls((state) => state[Controls.Up]);
 
-    useFrame(() =>  {
+    useFrame(({ camera }) =>  {
         if (!rigidBody.current) return;
         const delta = new Vector3(0.0, 0.0, 0.0);
 
@@ -67,10 +66,10 @@ function CharacterControllerBody({ maxVelocity }: Props) {
         }
 
         rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
-        const { x, y, z} = rigidBody.current.translation();
-        camera.lookAt(new Vector3(x, y, z));
-        camera.position.setX(x);
-        camera.position.setZ(z + 5.0);
+        const charPos = rigidBody.current.translation();
+        // rigidBody.current.tran
+        camera.lookAt(new Vector3(charPos.x, charPos.y, charPos.z));
+        camera.position.lerp(new Vector3(charPos.x + 10, 10, charPos.z + 10), 0.1);
 
         if (rigidBody.current.isMoving()) {
             rigidBody.current.setRotation(
