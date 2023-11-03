@@ -73,7 +73,6 @@ function CharacterControllerBody({ maxVelocity }: Props) {
         camera.position.setZ(z + 5.0);
 
         if (rigidBody.current.isMoving()) {
-
             rigidBody.current.setRotation(
                 new Quaternion().setFromEuler(new Euler(0.0, Math.atan2(delta.x, delta.z), 0.0)),
                 true
