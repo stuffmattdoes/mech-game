@@ -1,7 +1,7 @@
 // import { Duck as Character } from '.';
 import { Criminal as Character } from '.';
 import { KeyboardControls, useKeyboardControls } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { CapsuleCollider, RapierRigidBody, RigidBody } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { useRef } from 'react';
@@ -39,8 +39,7 @@ type Props = {
 
 function CharacterControllerBody({ maxVelocity }: Props) {
     const rigidBody = useRef<RapierRigidBody>() as React.MutableRefObject<RapierRigidBody>;
-
-    // const { camera } = useThree();
+    const { camera } = useThree();
     const actionPressed = useKeyboardControls((state) => state[Controls.Action]);
     const downPressed = useKeyboardControls((state) => state[Controls.Down]);
     const leftPressed = useKeyboardControls((state) => state[Controls.Left]);
