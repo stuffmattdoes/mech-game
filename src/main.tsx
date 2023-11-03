@@ -67,7 +67,6 @@ return <>
       // onUpdate={console.log}
       // position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
       // position={[ 4.0, 4.0, 4.0 ]}
-      position={[ 4.0, 4.0, 4.0 ]}
       zoom={0.35}
       right={viewport.aspect}
       top={1}

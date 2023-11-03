@@ -66,10 +66,13 @@ function CharacterControllerBody({ maxVelocity }: Props) {
         }
 
         rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
+        // rigidBody.current.applyImpulse(delta.normalize(), true);
+        
+        // Camera follow
         const charPos = rigidBody.current.translation();
-        // rigidBody.current.tran
         camera.lookAt(new Vector3(charPos.x, charPos.y, charPos.z));
-        camera.position.lerp(new Vector3(charPos.x + 10, 10, charPos.z + 10), 0.1);
+        // camera.position.lerp(new Vector3(charPos.x, 10, charPos.z + 10), 0.1);
+        camera.position.set(charPos.x, 10, charPos.z + 10);
 
         if (rigidBody.current.isMoving()) {
             rigidBody.current.setRotation(
