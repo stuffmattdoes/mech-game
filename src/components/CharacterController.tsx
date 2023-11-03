@@ -16,7 +16,7 @@ export const Controls = {
 
 export function CharacterController() {
     const controls = useControls('Player Controls', {
-        maxVelocity: { min: 0.5, max: 3.0, step: 0.2, value: 1.0 },
+        maxVelocity: { min: 0.5, max: 3.0, step: 0.2, value: 3.0 },
         acceleration: { min: 0.1, max: 0.5, step: 0.1, value: 1.0 }
     })
     return <group>
@@ -39,7 +39,7 @@ type Props = {
 
 function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
     const characterRef = useRef<Group<Object3DEventMap>>();
-    const rigidBodyRef = useRef<RapierRigidBody>();
+    const rigidBody = useRef<RapierRigidBody>() as React.MutableRefObject<RapierRigidBody>;
 
     // const { camera } = useThree();
     const actionPressed = useKeyboardControls((state) => state[Controls.Action]);
@@ -49,47 +49,44 @@ function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
     const upPressed = useKeyboardControls((state) => state[Controls.Up]);
 
     useFrame(() =>  {
-        if (!rigidBodyRef.current || !characterRef.current) return;
+        if (!rigidBody.current) return;
+        const delta = new Vector3(0.0, 0.0, 0.0);
 
-        const delta = new Vector3(0, 0, 0);
-        const linearVelocity = rigidBodyRef.current.linvel();
-
-
-        if (upPressed && linearVelocity.z < maxVelocity) {
-            delta.z += acceleration;
+        if (upPressed) {
+            delta.z = -1.0;
         }
 
-        if (downPressed && -linearVelocity.z < maxVelocity) {
-            delta.z -= acceleration;
+        if (downPressed) {
+            delta.z = 1.0;
         }
 
-        if (leftPressed && -linearVelocity.x < maxVelocity) {
-            delta.x -= acceleration;
+        if (leftPressed) {
+            delta.x = -1.0;
         }
 
-        if (rightPressed && linearVelocity.x < maxVelocity) {
-            delta.x += acceleration;
+        if (rightPressed) {
+            delta.x = 1.0;
         }
 
-        rigidBodyRef.current.applyImpulse(delta.normalize(), true);
-        const nextRotation = rigidBodyRef.current.rotation();
-        console.log(nextRotation);
-        if (Math.abs(linearVelocity.x) > 0.1 || Math.abs(linearVelocity.z) > 0.1) {
-            // characterRef.current.rotation.y = Math.atan2(linearVelocity.x, linearVelocity.z);
-            nextRotation.y = Math.atan2(linearVelocity.x, linearVelocity.z);
-            rigidBodyRef.current.setRotation(nextRotation, true);
+        const nextRotation = rigidBody.current.rotation();
+        rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
+
+        if (rigidBody.current.isMoving()) {
+            nextRotation.y = Math.atan2(delta.x, delta.z);
+            rigidBody.current.setRotation(nextRotation, true);
         }
     });
 
     return <RigidBody
         colliders={false}
-        ref={rigidBodyRef}
-        enabledRotations={[false, true, false]}
+        gravityScale={0.0}
+        ref={rigidBody}
+        // enabledRotations={[false, true, false]}
         scale={0.25}
         lockRotations
     >
         <CapsuleCollider args={[1.0, 1.0]} position={[0, 2.0, 0]}/>
-        <group ref={characterRef}>
+        <group>
             <Character />
         </group>
     </RigidBody>
