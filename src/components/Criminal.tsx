@@ -8,7 +8,7 @@ import { GroupProps } from '@react-three/fiber';
 import { Group, Object3DEventMap } from 'three';
 
 
-export function Character(props: Partial<GroupProps>) {
+export function Criminal(props: Partial<GroupProps>) {
   const group = useRef<Group<Object3DEventMap>>();
   const { nodes, materials } = useGLTF('/models/player.gltf');
 
@@ -17,7 +17,7 @@ export function Character(props: Partial<GroupProps>) {
     <group ref={group} {...props} dispose={null}>
       <group>
         <primitive object={nodes.LeftFootCtrl} />
-        <primitive object={nodes.RightFootCtrl} />
+        <primitive object={nodes.RightFootCtrl}/>
         <primitive object={nodes.HipsCtrl} />
         <skinnedMesh
           castShadow
@@ -31,4 +31,4 @@ export function Character(props: Partial<GroupProps>) {
   )
 }
 
-useGLTF.preload('https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/male/model.gltf');
+useGLTF.preload('/models/player.gltf');

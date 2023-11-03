@@ -1,4 +1,5 @@
-import { Character } from '.';
+// import { Duck as Character } from '.';
+import { Criminal as Character } from '.';
 import { KeyboardControls, useKeyboardControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { CapsuleCollider, RapierRigidBody, RigidBody } from '@react-three/rapier';
@@ -16,8 +17,7 @@ export const Controls = {
 
 export function CharacterController() {
     const controls = useControls('Player Controls', {
-        maxVelocity: { min: 0.5, max: 3.0, step: 0.2, value: 3.0 },
-        acceleration: { min: 0.1, max: 0.5, step: 0.1, value: 1.0 }
+        maxVelocity: { min: 0.5, max: 4.0, step: 0.2, value: 2.0 },
     })
     return <group>
         <KeyboardControls map={[
@@ -37,8 +37,7 @@ type Props = {
     acceleration: number
 }
 
-function CharacterControllerBody({ acceleration, maxVelocity }: Props) {
-    const characterRef = useRef<Group<Object3DEventMap>>();
+function CharacterControllerBody({ maxVelocity }: Props) {
     const rigidBody = useRef<RapierRigidBody>() as React.MutableRefObject<RapierRigidBody>;
 
     // const { camera } = useThree();
