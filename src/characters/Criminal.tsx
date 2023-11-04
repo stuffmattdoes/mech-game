@@ -7,17 +7,17 @@ import { useGLTF } from '@react-three/drei'
 import { GroupProps } from '@react-three/fiber';
 import { Group, Object3DEventMap } from 'three';
 
-
 export function Criminal(props: Partial<GroupProps>) {
   const group = useRef<Group<Object3DEventMap>>();
-  const { nodes, materials } = useGLTF('/models/player.gltf');
+  const gltf = useGLTF('/models/player.gltf');
+  const { nodes, materials } = gltf;
 
   return (
     // @ts-ignore
     <group ref={group} {...props} dispose={null}>
       <group>
         <primitive object={nodes.LeftFootCtrl} />
-        <primitive object={nodes.RightFootCtrl}/>
+        <primitive object={nodes.RightFootCtrl} />
         <primitive object={nodes.HipsCtrl} />
         <skinnedMesh
           castShadow

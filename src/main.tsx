@@ -7,7 +7,7 @@ import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
-import { LevelTestScene } from './scenes';
+import { LevelTestScene, PlayerTestScene } from './scenes';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
@@ -21,7 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <color attach='background' args={['#151729']} />
         <Suspense fallback={<Loader />}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
-          <LevelTestScene />
+          <PlayerTestScene />
           <Effects />
         </Suspense>
       </Canvas>
