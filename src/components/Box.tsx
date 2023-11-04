@@ -1,9 +1,9 @@
-import { useTexture } from "@react-three/drei";
-import { MeshProps } from "@react-three/fiber";
-import { RigidBody } from "@react-three/rapier";
-import { NearestFilter, RepeatWrapping } from "three";
+import { useTexture } from '@react-three/drei';
+import { MeshProps } from '@react-three/fiber';
+import { RigidBody } from '@react-three/rapier';
+import { Euler, NearestFilter, RepeatWrapping } from 'three';
 
-export function Box({ position, rotation, scale }: Partial<MeshProps>) {
+export function Box({ position, rotation = new Euler(0, Math.PI / 4.0, 0), scale }: Partial<MeshProps>) {
   const texture = useTexture('textures/checker.png',
     (tex) => {
       if (Array.isArray(tex))

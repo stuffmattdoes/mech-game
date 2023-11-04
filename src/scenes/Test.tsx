@@ -1,4 +1,4 @@
-import { Box, Gem, Floor } from "../components";
+import { Box, Gem, Floor } from '../components';
 
 export function TestScene() {
     return <scene>
