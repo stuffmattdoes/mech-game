@@ -17,9 +17,7 @@ export const Controls = {
 
 export function CharacterController() {
     const controls = useControls('Player Controls', {
-        acceleration: { min: 0.1, max: 1.0, step: 0.1, value: 0.1 },
         maxVelocity: { min: 0.5, max: 4.0, step: 0.2, value: 2.0 },
-        cameraLookat: true
     })
     return <group>
         <KeyboardControls map={[
@@ -35,12 +33,10 @@ export function CharacterController() {
 }
 
 type Props = {
-    acceleration: number,
-    cameraLookat: boolean,
     maxVelocity: number
 }
 
-function CharacterControllerBody({ cameraLookat, maxVelocity }: Props) {
+function CharacterControllerBody({ maxVelocity }: Props) {
     const rigidBody = useRef<RapierRigidBody>() as React.MutableRefObject<RapierRigidBody>;
     const actionPressed = useKeyboardControls((state) => state[Controls.Action]);
     const downPressed = useKeyboardControls((state) => state[Controls.Down]);
@@ -52,7 +48,6 @@ function CharacterControllerBody({ cameraLookat, maxVelocity }: Props) {
         if (!rigidBody.current) return;
 
         const delta = new Vector3(0.0, 0.0, 0.0);
-        const currentVelocity = rigidBody.current.linvel();
 
         if (upPressed) {
             delta.z = -1.0;
@@ -70,30 +65,18 @@ function CharacterControllerBody({ cameraLookat, maxVelocity }: Props) {
             delta.x = -1.0;
         }
 
-        rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);
-        // rigidBody.current.applyImpulse(delta.normalize(), true);
-        
-        // Camera follow
-        // camera.lookAt(new Vector3(
-        //     camera.position.x,
-        //     camera.position.y + 4.0,
-        //     camera.position.z + 4.0
-        // ));
+        rigidBody.current.setLinvel(delta.normalize().multiplyScalar(maxVelocity), true);        
+        const { x, z} = rigidBody.current.translation();
 
-        const charPos = rigidBody.current.translation();
-
-        if (cameraLookat) {
-            camera.lookAt(new Vector3(charPos.x, charPos.y, charPos.z));
-        }
-
-        // camera.position.lerp(new Vector3(charPos.x, 10, charPos.z + 10), 0.1);
-        camera.position.set(charPos.x, 10, charPos.z + 10);
+        // camera.position.set(charPos.x, 10, charPos.z + 10);  // causes camera jitter
+        camera.position.lerp(new Vector3(x, 10, z + 10), 0.25);  // solves camera jitter
 
         if (rigidBody.current.isMoving()) {
+            const { x, z } = rigidBody.current.linvel();
             rigidBody.current.setRotation(
                 new Quaternion().setFromEuler(new Euler(
                     0.0,
-                    Math.atan2(delta.x, delta.z),
+                    Math.atan2(x, z),
                     0.0
                 )),
                 true

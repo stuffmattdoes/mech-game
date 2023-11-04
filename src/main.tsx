@@ -62,27 +62,13 @@ return <>
       bottom={-1}
       // far={5}
       left={-viewport.aspect}
-      rotation={[0, 0, 0]}
       makeDefault
-      // near={0.1}
-      // onUpdate={console.log}
-      // position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
       position={[ 0, 4.0, 4.0 ]}
-      zoom={0.35}
-      right={viewport.aspect}
+      rotation={[-Math.PI / 4, 0, 0]}
       top={1}
-    >
-      {/* <spotLight
-        angle={Math.PI / 6}
-        castShadow
-        // color={0xff8800}
-        decay={2}
-        distance={10}
-        intensity={5}
-        penumbra={.02}
-        position={[0, 2, 1]}
-      /> */}
-    </OrthographicCamera>
+      right={viewport.aspect}
+      zoom={0.35}
+    />
     <ambientLight
       color={0x2d3645}
       intensity={5}
@@ -104,17 +90,7 @@ return <>
       // shadow-blurSamples={0}
       // shadow-radius={0}
     />
-    <OrbitControls
-      // enableRotate={false}
-      // enableZoom={false}
-      minAzimuthAngle={45}
-      screenSpacePanning
-      // mouseButtons={{
-      //   LEFT: MOUSE.PAN,
-      //   MIDDLE: MOUSE.DOLLY,
-      //   RIGHT: MOUSE.ROTATE
-      // }}
-    />
+    {/* <OrbitControls/> */}
   </>
 }
 
