@@ -1,14 +1,13 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion, Euler } from 'three';
-import { Canvas, extend, useThree } from '@react-three/fiber';
-import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress } from '@react-three/drei';
+import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion } from 'three';
+import { Canvas, extend } from '@react-three/fiber';
+import { Html, StatsGl, useProgress } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
-import { Physics } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
-import { PlayerTestScene, TestScene } from './scenes';
+import { LevelTestScene } from './scenes';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
@@ -22,8 +21,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <color attach='background' args={['#151729']} />
         <Suspense fallback={<Loader />}>
           {NODE_ENV !== 'production' ? <StatsGl /> : null}
-          <Environment />
-          <PlayerTestScene />
+          <LevelTestScene />
           <Effects />
         </Suspense>
       </Canvas>
@@ -50,49 +48,6 @@ function Loader() {
   return <Html center>{progress} % loaded</Html>
 }
 
-function Environment() {
-  const { viewport } = useThree();
-
-  // useFrame(({ camera, viewport }) => {
-  //   snapCameraToPixels(camera as IOrthographicCamera, viewport.aspect, 144, 120);
-  // });
-
-return <>
-    <OrthographicCamera
-      bottom={-1}
-      // far={5}
-      left={-viewport.aspect}
-      makeDefault
-      position={[ 0, 4.0, 4.0 ]}
-      rotation={[-Math.PI / 4, 0, 0]}
-      top={1}
-      right={viewport.aspect}
-      zoom={0.35}
-    />
-    <ambientLight
-      color={0x2d3645}
-      intensity={5}
-    />
-    <directionalLight
-      intensity={0.4}
-      color={0xfffc9c}
-      position={[60, 400, 270]}
-    />
-    <directionalLight
-      castShadow
-      intensity={1}
-      color={0xfffc9c}
-      position={[60, 400, 270]}
-      shadow-mapSize-width={2048}
-      shadow-mapSize-height={2048}
-      shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
-      // shadow-normalBias={-0.02}
-      // shadow-blurSamples={0}
-      // shadow-radius={0}
-    />
-    {/* <OrbitControls/> */}
-  </>
-}
 
 function snapCameraToPixels(
   camera: IOrthographicCamera,

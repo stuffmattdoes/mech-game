@@ -1,6 +1,6 @@
 import { Box, Gem, Floor } from '../components';
 
-export function TestScene() {
+export function ShapeScene() {
     return <scene>
       <Gem position={[0, 0.5, .25]}>
         <pointLight
