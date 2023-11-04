@@ -1,5 +1,4 @@
-import React, { Suspense } from 'react';
-import ReactDOM from 'react-dom/client';
+import { Suspense } from 'react';
 import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion } from 'three';
 import { Canvas, extend } from '@react-three/fiber';
 import { Html, StatsGl, useProgress } from '@react-three/drei';
@@ -14,20 +13,14 @@ const NODE_ENV = process.env.NODE_ENV;
 
 extend({ RenderPass });
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <div id='Canvas' style={{ width: '100vw', height: '100vh' }}>
-      <Canvas shadows>
-        <color attach='background' args={['#151729']} />
-        <Suspense fallback={<Loader />}>
-          {NODE_ENV !== 'production' ? <StatsGl /> : null}
-          <PlayerTestScene />
-          <Effects />
-        </Suspense>
-      </Canvas>
-    </div>
-  </React.StrictMode>
-);
+export const App = () => <Canvas shadows>
+<color attach='background' args={['#151729']} />
+<Suspense fallback={<Loader />}>
+  {NODE_ENV !== 'production' ? <StatsGl /> : null}
+  <PlayerTestScene />
+  <Effects />
+</Suspense>
+</Canvas>
 
 function Effects() {
   const controls = useControls('Pixelize', {
