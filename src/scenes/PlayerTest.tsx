@@ -1,8 +1,10 @@
-import { Plane, Player } from "../components";
+import { Physics } from '@react-three/rapier';
+import { Box, CharacterController, Floor } from '../components';
 
 export function PlayerTestScene() {
-    return <scene>
-        <Player />
-        <Plane scale={10} />
-    </scene>
+    return <Physics>
+        <Box position={[1, 0.5, 1]} scale={1}/>
+        <CharacterController />
+        <Floor scale={10} />
+    </Physics>
 }

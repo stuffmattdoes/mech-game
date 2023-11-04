@@ -1,4 +1,4 @@
-import { Box, Gem, Plane } from "../components";
+import { Box, Gem, Floor } from '../components';
 
 export function TestScene() {
     return <scene>
@@ -26,6 +26,6 @@ export function TestScene() {
         rotation={[0, Math.PI / 4, 0]}
         scale={[0.2, 0.2, 0.2]}
       />
-      <Plane scale={2} />
+      <Floor scale={2} />
     </scene>
   }

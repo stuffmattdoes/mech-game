@@ -1,5 +1,5 @@
-import { MeshProps, useFrame } from "@react-three/fiber";
-import React from "react";
+import { MeshProps, useFrame } from '@react-three/fiber';
+import React from 'react';
 
 export function Gem ({ children, position, rotation, scale }: Partial<MeshProps>) {
     const meshRef = React.useRef<any>();

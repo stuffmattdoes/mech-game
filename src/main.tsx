@@ -1,9 +1,10 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion } from 'three';
+import { OrthographicCamera as IOrthographicCamera, Vector3, Quaternion, Euler } from 'three';
 import { Canvas, extend, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, OrthographicCamera, StatsGl, useProgress } from '@react-three/drei';
 import { EffectComposer } from '@react-three/postprocessing';
+import { Physics } from '@react-three/rapier';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
@@ -33,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 function Effects() {
   const controls = useControls('Pixelize', {
     enabled: true,
-		granularity: { min: 1, max: 32, step: 1, value: 8 },
+		granularity: { min: 1, max: 32, step: 1, value: 6 },
     outlines: { min: 0, max: 1.0, step: 0.1, value: 0.6 },
     details: { min: 0, max: 2.0, step: 0.1, value: 0.6 },
 	});
@@ -59,51 +60,37 @@ function Environment() {
 return <>
     <OrthographicCamera
       bottom={-1}
-      far={5}
+      // far={5}
       left={-viewport.aspect}
       makeDefault
-      near={0.1}
-      // onUpdate={console.log}
-      position={[ .5, 2 * Math.tan(Math.PI / 6), 2]}
-      right={viewport.aspect}
+      position={[ 0, 4.0, 4.0 ]}
+      rotation={[-Math.PI / 4, 0, 0]}
       top={1}
+      right={viewport.aspect}
+      zoom={0.35}
     />
     <ambientLight
       color={0x2d3645}
-      intensity={2}
+      intensity={5}
     />
-    {/* <spotLight
-      angle={Math.PI / 6}
-      castShadow
-      color={0xff8800}
-      decay={2}
-      distance={10}
-      intensity={1}
-      penumbra={.02}
-      position={[0, 1, 0]}
-    /> */}
+    <directionalLight
+      intensity={0.4}
+      color={0xfffc9c}
+      position={[60, 400, 270]}
+    />
     <directionalLight
       castShadow
-      intensity={0.8}
+      intensity={1}
       color={0xfffc9c}
-      position={[60, 50, 100]}
+      position={[60, 400, 270]}
       shadow-mapSize-width={2048}
       shadow-mapSize-height={2048}
-      // shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
+      shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
       // shadow-normalBias={-0.02}
-      shadow-radius={0}
+      // shadow-blurSamples={0}
+      // shadow-radius={0}
     />
-    <OrbitControls
-      // enableRotate={false}
-      // enableZoom={false}
-      minAzimuthAngle={45}
-      screenSpacePanning
-      // mouseButtons={{
-      //   LEFT: MOUSE.PAN,
-      //   MIDDLE: MOUSE.DOLLY,
-      //   RIGHT: MOUSE.ROTATE
-      // }}
-    />
+    {/* <OrbitControls/> */}
   </>
 }
 

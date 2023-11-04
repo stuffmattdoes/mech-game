@@ -1,5 +1,5 @@
-import { useTexture } from "@react-three/drei";
-import { MeshProps } from "@react-three/fiber";
+import { useTexture } from '@react-three/drei';
+import { MeshProps } from '@react-three/fiber';
 
 export function Ball({
   position = [0, 0, 0],
