@@ -6,41 +6,45 @@ import { useMemo, useRef } from 'react'
 import { TransformControls, useGLTF } from '@react-three/drei'
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { Group, Object3DEventMap } from 'three';
+import { CCDIKHelper, CCDIKSolver, IKS } from 'three-stdlib';
 
 export function Criminal(props: Partial<GroupProps>) {
   const group = useRef<Group<Object3DEventMap>>();
-  const { materials, nodes, scene } = useGLTF('/models/player.gltf');
+  const { materials, nodes } = useGLTF('/models/player.gltf');
   const mesh = nodes['characterMedium'];
-  // console.log(mesh);
-  
-  // const [ iRoot, iTarget, iLeftFoot, iLeftLeg, iLeftUpLeg ] = useMemo(() => [
-  //   mesh.skeleton.bones.findIndex((bone) => bone.name === 'Hips'),
-  //   mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFootCtrl'),
-  //   mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFoot'),
-  //   mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftLeg'),
-  //   mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftUpLeg')
-  // ], [mesh]);
+  console.log(nodes);
 
-  // const iks: IKS[] = [
-  //   {
-  //     target: iTarget,
-  //     effector: iLeftFoot,
-  //     // minAngle: 0,
-  //     // maxAngle: 90,
-  //     // iteration: 2,
-  //     links: [
-  //       { enabled: true, index: iLeftFoot },
-  //       { enabled: true, index: iLeftLeg },
-  //       { enabled: true, index: iLeftUpLeg },
-  //       { enabled: true, index: iRoot },
-  //     ]
-  //   }
-  // ];
-  // const ikSolver = new CCDIKSolver( mesh, iks );
+  const [iHips, iLeftFootCtrl, iLeftFoot, iLeftLeg, iLeftUpLeg] = useMemo(() => [
+    mesh.skeleton.bones.findIndex((bone) => bone.name === 'Hips'),
+    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFootCtrl'),
+    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFoot'),
+    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftLeg'),
+    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftUpLeg')
+  ], [mesh]);
+
+  const leftLeftIks: IKS[] = [{
+    target: iLeftFootCtrl,
+    effector: iLeftFoot,
+    // minAngle: 0,
+    // maxAngle: 90,
+    // iteration: 2,
+    links: [
+      // { enabled: true, index: iLeftFoot },
+      { enabled: true, index: iLeftLeg },
+      { enabled: true, index: iLeftUpLeg },
+      // { enabled: true, index: iHips },
+    ]
+  }];
+
+  const leftLegIkSolver = new CCDIKSolver(mesh, leftLeftIks);
+  // const ikHelper = new CCDIKHelper(mesh, iks);
+
+  setInterval(() => {
+    leftLegIkSolver.update();
+  }, 100);
 
   // useFrame(({ clock }) => {
   //   const time = clock.getElapsedTime();
-  //   leftFoot.position.z = Math.sin(time);
   //   ikSolver.update();
   // });
 
@@ -48,7 +52,7 @@ export function Criminal(props: Partial<GroupProps>) {
     // @ts-ignore
     <group ref={group} {...props} dispose={null}>
       {/* <skeletonHelper args={[mesh]}/> */}
-      <TransformControls mode='translate' object={nodes['LeftFoot']}/>
+      <TransformControls mode='translate' object={nodes['LeftFoot']} />
       <group>
         {/* <primitive object={nodes.LeftFootCtrl} /> */}
         {/* <primitive object={nodes.RightFootCtrl} /> */}
