@@ -2,16 +2,16 @@ import { Physics } from '@react-three/rapier';
 import { OrbitControls, OrthographicCamera, TransformControls } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Box, CharacterController, Floor } from '../components';
-import { Bone, BoxGeometry, BufferAttribute, Euler, Float32BufferAttribute, Group, InterleavedBufferAttribute, Skeleton, SkinnedMesh, Uint16BufferAttribute, Vector3, Vector4 } from 'three';
+import { Bone, BoxGeometry, BufferAttribute, Euler, Float32BufferAttribute, Group, InterleavedBufferAttribute, MeshBasicMaterial, Skeleton, SkinnedMesh, Uint16BufferAttribute, Vector3, Vector4 } from 'three';
 import { useEffect, useMemo, useRef } from 'react';
 import { mergeBufferGeometries } from 'three-stdlib';
 
 export function IKTestScene() {
     const { viewport } = useThree();
-    const skelRef = useRef<Skeleton>();
-    const upperLegRef = useRef<BoxGeometry>();
-    const lowerLegRef = useRef<BoxGeometry>();
-    const footRef = useRef<BoxGeometry>();
+    // const skelRef = useRef<Skeleton>();
+    // const upperLegRef = useRef<BoxGeometry>();
+    // const lowerLegRef = useRef<BoxGeometry>();
+    // const footRef = useRef<BoxGeometry>();
 
     const [ bones, upperLegGeo, lowerLegGeo, footGeo ] = useMemo(() => {
         const bones = [];
@@ -50,9 +50,11 @@ export function IKTestScene() {
     mergedGeo.setAttribute('skinIndex', new Uint16BufferAttribute(skinIndices.flat(), 4));
     mergedGeo.setAttribute('skinWeight', new Float32BufferAttribute(skinWeights.flat(), 4));
 
-    // useEffect(() => {
-    //     console.log(skelRef.current);
-    // });
+    var material = new MeshBasicMaterial({ skinning: true });
+    var mesh = new SkinnedMesh(mergedGeo, material);
+    const skeleton = new Skeleton(bones);
+    // mesh.add(bones);
+    mesh.bind(skeleton);
 
     return <Physics>
         <OrthographicCamera
@@ -84,39 +86,8 @@ export function IKTestScene() {
             shadow-mapSize-height={2048}
             shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
         />
-        {/* {skelRef.current ? <skeletonHelper args={[skelRef.current]}/> : null} */}
-        <skeleton args={[bones]} ref={skelRef} />
         {/* <TransformControls object={footRef.current}/> */}
-        <group rotation={[0, 0.5, 0]}>
-            {/* Upper */}
-            <mesh
-                castShadow
-                position={[0.4, 1.2, 0]}
-                rotation={[0, 0, 1]}
-            >
-                <primitive object={upperLegGeo} />
-                <meshToonMaterial />    
-            </mesh>
-            {/* Lower */}
-            <mesh
-                castShadow
-                position={[0.5, 0.5, 0]}
-                rotation={[0, 0, -0.75]}
-            >
-                <primitive object={lowerLegGeo}/>
-                <meshToonMaterial />
-            </mesh>
-            {/* Foot */}
-            <mesh
-                castShadow
-                position={[0, .25 / 2, 0]}
-                ref={footRef}
-            >
-                <primitive object={footGeo}/>
-                <meshToonMaterial />
-            </mesh>
-            {/* </skeleton> */}
-        </group>
+        
         {/* <OrbitControls /> */}
         <Floor/>
     </Physics>
