@@ -14,20 +14,33 @@ export function Criminal(props: Partial<GroupProps>) {
   const mesh = nodes['characterMedium'];
   console.log(nodes);
 
-  const [iHips, iLeftFootCtrl, iLeftFoot, iLeftLeg, iLeftUpLeg] = useMemo(() => [
-    mesh.skeleton.bones.findIndex((bone) => bone.name === 'Hips'),
-    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFootCtrl'),
-    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFoot'),
-    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftLeg'),
-    mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftUpLeg')
-  ], [mesh]);
+  const {
+    iLeftFootCtrl, iLeftFoot, iLeftLeg, iLeftUpLeg,
+    iRightFootCtrl, iRightFoot, iRightLeg, iRightUpLeg,
+  } = useMemo(() => ({
+    // Left
+    iLeftFootCtrl: mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFootCtrl'),
+    iLeftFoot: mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftFoot'),
+    iLeftLeg: mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftLeg'),
+    iLeftUpLeg: mesh.skeleton.bones.findIndex((bone) => bone.name === 'LeftUpLeg'),
 
-  const leftLeftIks: IKS[] = [{
+    // Right
+    iRightFootCtrl: mesh.skeleton.bones.findIndex((bone) => bone.name === 'RightFootCtrl'),
+    iRightFoot: mesh.skeleton.bones.findIndex((bone) => bone.name === 'RightFoot'),
+    iRightLeg: mesh.skeleton.bones.findIndex((bone) => bone.name === 'RightLeg'),
+    iRightUpLeg: mesh.skeleton.bones.findIndex((bone) => bone.name === 'RightUpLeg')
+  }), [mesh]);
+
+  const MIN_LEG_ANGLE = 0;
+  const MAX_LEG_ANGLE = 15;
+  const IK_ITERATION = 1;
+
+  const leftLegIks: IKS[] = [{
     target: iLeftFootCtrl,
     effector: iLeftFoot,
-    // minAngle: 0,
-    // maxAngle: 90,
-    // iteration: 2,
+    minAngle: MIN_LEG_ANGLE,
+    maxAngle: MAX_LEG_ANGLE,
+    iteration: IK_ITERATION,
     links: [
       // { enabled: true, index: iLeftFoot },
       { enabled: true, index: iLeftLeg },
@@ -36,35 +49,64 @@ export function Criminal(props: Partial<GroupProps>) {
     ]
   }];
 
-  const leftLegIkSolver = new CCDIKSolver(mesh, leftLeftIks);
+  const rightLegIks: IKS[] = [{
+    target: iRightFootCtrl,
+    effector: iRightFoot,
+    minAngle: MIN_LEG_ANGLE,
+    maxAngle: MAX_LEG_ANGLE,
+    iteration: IK_ITERATION,
+    links: [
+      // { enabled: true, index: iLeftFoot },
+      {
+        enabled: true,
+        index: iRightLeg,
+        // limitation?: Vector3
+        // rotationMin?: Vector3
+        // rotationMax?: Vector3
+      },
+      {
+        enabled: true,
+        index: iRightUpLeg,
+        // limitation?: Vector3
+        // rotationMin?: Vector3
+        // rotationMax?: Vector3
+      },
+      // { enabled: true, index: iHips },
+    ]
+  }];
+
+  const leftLegIkSolver = new CCDIKSolver(mesh, leftLegIks);
+  const rightLegIkSolder = new CCDIKSolver(mesh, rightLegIks);
   // const ikHelper = new CCDIKHelper(mesh, iks);
 
-  setInterval(() => {
-    leftLegIkSolver.update();
-  }, 100);
+  // setInterval(() => {
+  //   leftLegIkSolver.update();
+  //   rightLegIkSolder.update();
+  // }, 100);
 
-  // useFrame(({ clock }) => {
-  //   const time = clock.getElapsedTime();
-  //   ikSolver.update();
+  // useFrame(() => {
+  //   leftLegIkSolver.update();
+  //   rightLegIkSolder.update();
   // });
 
   return (
     // @ts-ignore
     <group ref={group} {...props} dispose={null}>
-      {/* <skeletonHelper args={[mesh]}/> */}
-      <TransformControls mode='translate' object={nodes['LeftFoot']} />
-      <group>
-        {/* <primitive object={nodes.LeftFootCtrl} /> */}
-        {/* <primitive object={nodes.RightFootCtrl} /> */}
-        <primitive object={nodes.HipsCtrl} />
-        <skinnedMesh
-          castShadow
-          geometry={nodes.characterMedium.geometry}
-          material={materials['skin.001']}
-          receiveShadow
-          skeleton={nodes.characterMedium.skeleton}
-        />
-      </group>
+      <skeletonHelper args={[mesh]} material-linewidth={2}/>
+      <TransformControls mode='translate'>
+        <group>
+          {/* <primitive object={nodes.LeftFootCtrl} /> */}
+          {/* <primitive object={nodes.RightFootCtrl} /> */}
+          <primitive object={nodes.HipsCtrl} />
+          <skinnedMesh
+            castShadow
+            geometry={nodes.characterMedium.geometry}
+            material={materials['skin.001']}
+            receiveShadow
+            skeleton={nodes.characterMedium.skeleton}
+          />
+        </group>
+      </TransformControls>
     </group>
   )
 }

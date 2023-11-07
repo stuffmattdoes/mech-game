@@ -6,7 +6,9 @@ import { EffectComposer } from '@react-three/postprocessing';
 import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
-import { LevelTestScene, PlayerTestScene } from './scenes';
+import { LevelTestScene } from './scenes/LevelTest';
+import { PlayerTestScene } from './scenes/PlayerTest';
+import { IKTestScene } from './scenes/IKTest';
 import './styles.css';
 
 const NODE_ENV = process.env.NODE_ENV;
@@ -17,7 +19,8 @@ export const App = () => <Canvas shadows>
 <color attach='background' args={['#151729']} />
 <Suspense fallback={<Loader />}>
   {NODE_ENV !== 'production' ? <StatsGl /> : null}
-  <PlayerTestScene />
+  <IKTestScene />
+  {/* <PlayerTestScene/> */}
   <Effects />
 </Suspense>
 </Canvas>
