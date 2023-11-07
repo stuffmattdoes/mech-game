@@ -8,10 +8,6 @@ import { mergeBufferGeometries } from 'three-stdlib';
 
 export function IKTestScene() {
     const { viewport } = useThree();
-    // const skelRef = useRef<Skeleton>();
-    // const upperLegRef = useRef<BoxGeometry>();
-    // const lowerLegRef = useRef<BoxGeometry>();
-    // const footRef = useRef<BoxGeometry>();
 
     const [ bones, upperLegGeo, lowerLegGeo, footGeo ] = useMemo(() => {
         const bones = [];
@@ -50,11 +46,11 @@ export function IKTestScene() {
     mergedGeo.setAttribute('skinIndex', new Uint16BufferAttribute(skinIndices.flat(), 4));
     mergedGeo.setAttribute('skinWeight', new Float32BufferAttribute(skinWeights.flat(), 4));
 
-    var material = new MeshBasicMaterial({ skinning: true });
-    var mesh = new SkinnedMesh(mergedGeo, material);
+    // var material = new MeshBasicMaterial({ skinning: true });
+    // var mesh = new SkinnedMesh(mergedGeo, material);
     const skeleton = new Skeleton(bones);
     // mesh.add(bones);
-    mesh.bind(skeleton);
+    // mesh.bind(skeleton);
 
     return <Physics>
         <OrthographicCamera
@@ -87,7 +83,13 @@ export function IKTestScene() {
             shadow-bias={-0.0001}  // improves shadow artifact on toon shader, but offsets shadow
         />
         {/* <TransformControls object={footRef.current}/> */}
-        
+        <skinnedMesh
+            // castShadow
+            geometry={mergedGeo}
+            material={new MeshBasicMaterial()}
+            receiveShadow
+            skeleton={skeleton}
+          />
         {/* <OrbitControls /> */}
         <Floor/>
     </Physics>
