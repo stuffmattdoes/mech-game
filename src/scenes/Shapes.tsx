@@ -1,7 +1,23 @@
+import { Physics } from '@react-three/rapier';
 import { Box, Gem, Floor } from '../components';
+import { OrbitControls, OrthographicCamera } from '@react-three/drei';
+import { useThree } from '@react-three/fiber';
 
 export function ShapeScene() {
-    return <scene>
+  const { viewport } = useThree();
+
+    return <Physics>
+         <OrthographicCamera
+            bottom={-1}
+            // far={5}
+            left={-viewport.aspect}
+            makeDefault
+            position={[0, 4.0, 4.0]}
+            rotation={[-Math.PI / 4, 0, 0]}
+            top={1}
+            right={viewport.aspect}
+            // zoom={0.5}
+        />
       <Gem position={[0, 0.5, .25]}>
         <pointLight
           // castShadow
@@ -27,5 +43,6 @@ export function ShapeScene() {
         scale={[0.2, 0.2, 0.2]}
       />
       <Floor scale={2} />
-    </scene>
+      <OrbitControls/>
+    </Physics>
   }

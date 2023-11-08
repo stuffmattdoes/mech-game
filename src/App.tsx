@@ -7,6 +7,7 @@ import { useControls } from 'leva';
 import { RenderPass } from 'three-stdlib';
 import { Edges } from './effects/Edges';
 import { LevelTestScene } from './scenes/LevelTest';
+import { ShapeScene } from './scenes/Shapes';
 import { PlayerTestScene } from './scenes/PlayerTest';
 import { IKTestScene } from './scenes/IKTest';
 import './styles.css';
@@ -19,8 +20,9 @@ export const App = () => <Canvas shadows>
 <color attach='background' args={['#151729']} />
 <Suspense fallback={<Loader />}>
   {NODE_ENV !== 'production' ? <StatsGl /> : null}
-  <IKTestScene />
+  {/* <ShapeScene/> */}
   {/* <PlayerTestScene/> */}
+  <IKTestScene />
   <Effects />
 </Suspense>
 </Canvas>
@@ -43,7 +45,6 @@ function Loader() {
   const { progress } = useProgress();
   return <Html center>{progress} % loaded</Html>
 }
-
 
 function snapCameraToPixels(
   camera: IOrthographicCamera,

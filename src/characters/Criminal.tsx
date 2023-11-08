@@ -12,7 +12,6 @@ export function Criminal(props: Partial<GroupProps>) {
   const group = useRef<Group<Object3DEventMap>>();
   const { materials, nodes } = useGLTF('/models/player.gltf');
   const mesh = nodes['characterMedium'];
-  console.log(nodes);
 
   const {
     iLeftFootCtrl, iLeftFoot, iLeftLeg, iLeftUpLeg,
@@ -88,6 +87,8 @@ export function Criminal(props: Partial<GroupProps>) {
   //   leftLegIkSolver.update();
   //   rightLegIkSolder.update();
   // });
+
+  console.log(nodes.characterMedium.skeleton, nodes.characterMedium.geometry);
 
   return (
     // @ts-ignore
