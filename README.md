@@ -36,27 +36,28 @@ The effect layers are as follows:
 2. On the render target (the main camera), reduce the resolution so it appears pixellated
 <img width="973" alt="pixel-02" src="https://github.com/user-attachments/assets/b46415d5-af5a-4e46-b261-0adbd7fe3e59">
 
-3. Access the [depth texture](https://threejs.org/docs/#api/en/textures/DepthTexture) of the scene
+3. Access the [depth texture](https://threejs.org/docs/#api/en/textures/DepthTexture) of the render target (our main camera)
+A depth texture is a common & typically necessary render pass done to determine how far away from the camera each surface in a scene is.
+This information is used to draw things in the proper order.
 <img width="975" alt="pixel-03" src="https://github.com/user-attachments/assets/038b6370-9ebb-4453-837a-d3562a5546e9">
 
-4. Using the depth map, compare all pixel values to their neighbors.
-A depth texture is a common render pass done to determine how deep each surface in a scene is in order to make sure objects draw in the proper order.
+5. Using the depth texture, compare all pixel values to their neighbors.
 The areas of stark contrast in the depth texture (dark to light/light to dark) indicate a stark difference in depth.
 <img width="975" alt="pixel-04" src="https://github.com/user-attachments/assets/ad30b679-d35a-4bf2-88d2-00a9f6304c79">
 
-We're going to draw dark lines there, which will appear as an object's outline.
+6. We're going to draw dark lines there, which will appear as an object's outline.
 However, you can see this leaves the bottom of certain objects without an outline.
 This is because there's not a stark difference in depth between an object's bottom and the floor.
 <img width="974" alt="pixel-05" src="https://github.com/user-attachments/assets/7b106c3a-d35e-43da-9d06-809f272b8023">
 
-6. To achieve bottom outlines, we need to access the [normal map](https://threejs.org/docs/#api/en/materials/MeshStandardMaterial.normalMap) of the scene.
+7. To achieve bottom outlines, we need to access the [normal map](https://threejs.org/docs/#api/en/materials/MeshStandardMaterial.normalMap) of the scene.
 a normal map is a common render pass done to determine which way each surface is facing in order to properly calculate lighting.
 We don't care about lighting, but we can use the surface directions to draw some more outlines.
 In the last step, we drew outlines around stark differences in the color of the depth texture.
 We're going to do the same here - draw light outlines around areas of stark directional change.
 <img width="974" alt="pixel-06" src="https://github.com/user-attachments/assets/11c55736-fa05-4d57-bcde-e92a9119e907">
 
-Now we discard the depth texture and normal map, and render the pixellated image we created in step 2.
+8. Now we discard the depth texture and normal map, and render the pixellated image we created in step 2.
 But this time, we include the dark & light outlines.
 <img width="972" alt="pixel-07" src="https://github.com/user-attachments/assets/fb39539f-311d-4efb-8f98-e3cb7d43f1f2">
 
